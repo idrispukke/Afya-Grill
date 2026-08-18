@@ -86,6 +86,34 @@ export type AdminPayout = {
   status: "Pago" | "Pendente";
 };
 
+export type ReservationStatus = "Pendente" | "Confirmada" | "Cancelada" | "Concluída";
+
+export type AdminReservation = {
+  id: string;
+  codigo: string;
+  cliente: string;
+  telefone: string;
+  email?: string | undefined;
+  casa: string;
+  pessoas: number;
+  data: string;
+  hora: string;
+  mesa?: string | undefined;
+  observacao?: string | undefined;
+  status: ReservationStatus;
+  origem: "Site" | "QR Code" | "Telefone" | "Painel";
+  criadoEm: string;
+};
+
+export type AdminTable = {
+  id: string;
+  casa: string;
+  numero: number;
+  capacidade: number;
+  area: "Salão" | "Varanda" | "Bar" | "Área externa";
+  scans: number;
+};
+
 export const seedOrders: AdminOrder[] = [
   {
     id: "AFY-2041",
@@ -246,6 +274,104 @@ export const seedPayouts: AdminPayout[] = [
   },
 ];
 
+export const seedReservations: AdminReservation[] = [
+  {
+    id: "res-1",
+    codigo: "AFY-R482",
+    cliente: "Beatriz Nogueira",
+    telefone: "(21) 98123-4455",
+    email: "beatriz@email.com",
+    casa: "Brasa & Cia",
+    pessoas: 4,
+    data: "2026-08-17",
+    hora: "20:00",
+    mesa: "Mesa 12",
+    observacao: "Aniversário — pediu vela na sobremesa",
+    status: "Confirmada",
+    origem: "QR Code",
+    criadoEm: "2026-08-15 14:02",
+  },
+  {
+    id: "res-2",
+    codigo: "AFY-R483",
+    cliente: "Thiago Andrade",
+    telefone: "(21) 99887-2210",
+    casa: "Kaze Sushi Bar",
+    pessoas: 2,
+    data: "2026-08-17",
+    hora: "21:30",
+    mesa: "Balcão 3",
+    status: "Pendente",
+    origem: "Site",
+    criadoEm: "2026-08-16 09:40",
+  },
+  {
+    id: "res-3",
+    codigo: "AFY-R484",
+    cliente: "Luiza Fontes",
+    telefone: "(21) 98221-7734",
+    email: "luiza.fontes@email.com",
+    casa: "Osteria Lunare",
+    pessoas: 6,
+    data: "2026-08-18",
+    hora: "19:30",
+    mesa: "Mesa 5",
+    observacao: "Uma criança, precisa de cadeirão",
+    status: "Confirmada",
+    origem: "Site",
+    criadoEm: "2026-08-14 18:21",
+  },
+  {
+    id: "res-4",
+    codigo: "AFY-R485",
+    cliente: "Pedro Salgado",
+    telefone: "(21) 97744-1290",
+    casa: "Forno Sette",
+    pessoas: 3,
+    data: "2026-08-19",
+    hora: "20:30",
+    status: "Pendente",
+    origem: "Telefone",
+    criadoEm: "2026-08-16 20:05",
+  },
+  {
+    id: "res-5",
+    codigo: "AFY-R486",
+    cliente: "Marina Duarte",
+    telefone: "(21) 98812-4410",
+    casa: "Brasa & Cia",
+    pessoas: 2,
+    data: "2026-08-16",
+    hora: "20:00",
+    mesa: "Mesa 8",
+    status: "Concluída",
+    origem: "QR Code",
+    criadoEm: "2026-08-13 11:15",
+  },
+  {
+    id: "res-6",
+    codigo: "AFY-R487",
+    cliente: "Caio Bentes",
+    telefone: "(21) 99604-7723",
+    casa: "Bar Ébano",
+    pessoas: 5,
+    data: "2026-08-15",
+    hora: "22:00",
+    status: "Cancelada",
+    origem: "Site",
+    criadoEm: "2026-08-12 16:48",
+  },
+];
+
+export const seedTables: AdminTable[] = [
+  { id: "t1", casa: "Brasa & Cia", numero: 1, capacidade: 2, area: "Salão", scans: 142 },
+  { id: "t2", casa: "Brasa & Cia", numero: 2, capacidade: 4, area: "Salão", scans: 118 },
+  { id: "t3", casa: "Brasa & Cia", numero: 3, capacidade: 4, area: "Varanda", scans: 96 },
+  { id: "t4", casa: "Brasa & Cia", numero: 4, capacidade: 6, area: "Área externa", scans: 71 },
+  { id: "t5", casa: "Kaze Sushi Bar", numero: 1, capacidade: 2, area: "Bar", scans: 88 },
+  { id: "t6", casa: "Kaze Sushi Bar", numero: 2, capacidade: 4, area: "Salão", scans: 64 },
+];
+
 export const revenueSeries = [
   { dia: "Seg", valor: 4200 },
   { dia: "Ter", valor: 5100 },
@@ -256,10 +382,34 @@ export const revenueSeries = [
   { dia: "Dom", valor: 8760 },
 ];
 
+export const categorySplit = [
+  { categoria: "Destaques", valor: 38 },
+  { categoria: "Principais", valor: 29 },
+  { categoria: "Drinks", valor: 18 },
+  { categoria: "Doces", valor: 15 },
+];
+
+export const ordersByHour = [
+  { hora: "11h", pedidos: 8 },
+  { hora: "13h", pedidos: 26 },
+  { hora: "15h", pedidos: 12 },
+  { hora: "17h", pedidos: 9 },
+  { hora: "19h", pedidos: 31 },
+  { hora: "21h", pedidos: 44 },
+  { hora: "23h", pedidos: 19 },
+];
+
 export const statusFlow: OrderStatus[] = [
   "Novo",
   "Preparando",
   "A caminho",
   "Entregue",
   "Cancelado",
+];
+
+export const reservationStatusFlow: ReservationStatus[] = [
+  "Pendente",
+  "Confirmada",
+  "Concluída",
+  "Cancelada",
 ];
