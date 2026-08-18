@@ -1,8 +1,17 @@
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
+import {
+  Area,
+  AreaChart,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+} from "recharts";
 
-export const brl = (v: number) =>
-  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+export const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export function PageHeader({
   title,
@@ -84,7 +93,7 @@ export function StatCard({
         <span className="text-xs uppercase tracking-widest text-muted-foreground">{label}</span>
         {icon && <span className="text-primary">{icon}</span>}
       </div>
-      <p className="mt-3 font-display text-3xl">{value}</p>
+      <p className="mt-3 break-words font-display text-3xl">{value}</p>
       {delta && <p className="mt-1 text-xs text-primary">{delta}</p>}
     </motion.div>
   );
@@ -187,12 +196,136 @@ export function Field({
   );
 }
 
+function ChartTooltip({
+  active,
+  payload,
+  label,
+  formatter,
+}: {
+  active?: boolean;
+  label?: string;
+  payload?: { name: string; value: number; color?: string }[];
+  formatter?: ((v: number) => string) | undefined;
+}) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="rounded-xl border border-border bg-popover px-3 py-2 text-xs shadow-soft">
+      {label && <p className="mb-1 text-muted-foreground">{label}</p>}
+      {payload.map((p) => (
+        <p key={p.name} className="font-medium">
+          {p.name}: {formatter ? formatter(p.value) : p.value}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+export function AreaTrend({
+  data,
+  xKey,
+  yKey,
+  formatter,
+}: {
+  data: Record<string, string | number>[];
+  xKey: string;
+  yKey: string;
+  formatter?: ((v: number) => string) | undefined;
+}) {
+  return (
+    <div className="h-44 w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={data} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
+          <defs>
+            <linearGradient id="areaTrendFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.55} />
+              <stop offset="100%" stopColor="var(--primary)" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <XAxis
+            dataKey={xKey}
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+          />
+          <Tooltip
+            cursor={{ stroke: "var(--border)" }}
+            content={<ChartTooltip formatter={formatter} />}
+          />
+          <Area
+            type="monotone"
+            dataKey={yKey}
+            stroke="var(--primary)"
+            strokeWidth={2.5}
+            fill="url(#areaTrendFill)"
+            animationDuration={900}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+const DONUT_COLORS = ["var(--primary)", "var(--gold)", "var(--ember)", "var(--muted-foreground)"];
+
+export function DonutChart({
+  data,
+  nameKey,
+  valueKey,
+}: {
+  data: Record<string, string | number>[];
+  nameKey: string;
+  valueKey: string;
+}) {
+  const total = data.reduce((a, d) => a + Number(d[valueKey] ?? 0), 0);
+  return (
+    <div className="flex items-center gap-6">
+      <div className="h-40 w-40 shrink-0">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              dataKey={valueKey}
+              nameKey={nameKey}
+              innerRadius={48}
+              outerRadius={72}
+              paddingAngle={3}
+              animationDuration={900}
+              stroke="none"
+            >
+              {data.map((_, i) => (
+                <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip content={<ChartTooltip formatter={(v) => `${v}%`} />} />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+      <ul className="flex-1 space-y-2.5 text-sm">
+        {data.map((d, i) => (
+          <li key={String(d[nameKey])} className="flex items-center justify-between gap-3">
+            <span className="flex items-center gap-2 text-muted-foreground">
+              <span
+                className="h-2.5 w-2.5 rounded-full"
+                style={{ background: DONUT_COLORS[i % DONUT_COLORS.length] }}
+              />
+              {d[nameKey]}
+            </span>
+            <span className="font-medium">
+              {total ? Math.round((Number(d[valueKey]) / total) * 100) : 0}%
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function Bars({ data }: { data: { dia: string; valor: number }[] }) {
   const max = Math.max(...data.map((d) => d.valor));
   return (
     <div className="flex h-44 items-end gap-3">
       {data.map((d, i) => (
-        <div key={d.dia} className="flex flex-1 flex-col items-center gap-2">
+        <div key={d.dia} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
           <motion.div
             initial={{ height: 0 }}
             animate={{ height: `${(d.valor / max) * 100}%` }}
