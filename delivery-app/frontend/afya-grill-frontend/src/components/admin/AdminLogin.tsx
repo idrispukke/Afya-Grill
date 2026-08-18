@@ -1,6 +1,7 @@
+import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { Lock, Mail, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Lock, Mail, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import logo from "@/assets/afya-grill-logo.png";
 import { useAdmin } from "@/lib/admin";
@@ -30,6 +31,14 @@ export function AdminLogin() {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
       <div className="bg-glow pointer-events-none absolute inset-0 opacity-70" />
+
+      <Link
+        to="/"
+        className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground sm:left-6 sm:top-6"
+      >
+        <ArrowLeft className="h-4 w-4" /> Voltar para o site
+      </Link>
+
       <motion.form
         onSubmit={onSubmit}
         initial={{ opacity: 0, y: 24, scale: 0.97 }}
