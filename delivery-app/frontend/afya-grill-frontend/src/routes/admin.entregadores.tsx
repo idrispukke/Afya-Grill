@@ -42,7 +42,11 @@ function Entregadores() {
                   <MapPin className="h-3 w-3" /> {c.zona} · {c.veiculo}
                 </p>
               </div>
-              <Pill tone={c.status === "Em rota" ? "warn" : c.status === "Disponível" ? "good" : "neutral"}>
+              <Pill
+                tone={
+                  c.status === "Em rota" ? "warn" : c.status === "Disponível" ? "good" : "neutral"
+                }
+              >
                 {c.status}
               </Pill>
             </div>

@@ -65,7 +65,9 @@ function Casas() {
               >
                 {h.ativo ? "Pausar loja" : "Reabrir loja"}
               </ActionButton>
-              <ActionButton onClick={() => toast("Contrato enviado por e-mail")}>Ver contrato</ActionButton>
+              <ActionButton onClick={() => toast("Contrato enviado por e-mail")}>
+                Ver contrato
+              </ActionButton>
             </div>
           </motion.article>
         ))}

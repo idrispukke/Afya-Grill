@@ -1,7 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ActionButton, PageHeader, Panel, Pill, Row, TableShell, brl } from "@/components/admin/AdminUI";
+import {
+  ActionButton,
+  PageHeader,
+  Panel,
+  Pill,
+  Row,
+  TableShell,
+  brl,
+} from "@/components/admin/AdminUI";
 import { statusFlow, type OrderStatus } from "@/data/admin";
 import { useAdmin } from "@/lib/admin";
 
@@ -9,7 +17,10 @@ export const Route = createFileRoute("/admin/pedidos")({
   head: () => ({
     meta: [
       { title: "Pedidos — Painel Afya Grill" },
-      { name: "description", content: "Acompanhe e atualize o status de cada pedido em andamento." },
+      {
+        name: "description",
+        content: "Acompanhe e atualize o status de cada pedido em andamento.",
+      },
     ],
   }),
   component: Pedidos,
@@ -37,7 +48,9 @@ function Pedidos() {
               key={s}
               onClick={() => setFiltro(s)}
               className={`rounded-full px-3.5 py-1.5 text-xs transition-all ${
-                filtro === s ? "text-primary-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"
+                filtro === s
+                  ? "text-primary-foreground"
+                  : "bg-secondary text-muted-foreground hover:text-foreground"
               }`}
               style={filtro === s ? { background: "var(--gradient-ember)" } : undefined}
             >
@@ -57,14 +70,20 @@ function Pedidos() {
             <Row key={o.id}>
               <td>
                 <p className="font-medium">{o.id}</p>
-                <p className="text-xs text-muted-foreground">{o.criadoEm} · {o.entregador}</p>
+                <p className="text-xs text-muted-foreground">
+                  {o.criadoEm} · {o.entregador}
+                </p>
               </td>
               <td>{o.cliente}</td>
               <td className="text-muted-foreground">{o.itens}</td>
               <td>{o.pagamento}</td>
               <td>{brl(o.total)}</td>
               <td>
-                <Pill tone={o.status === "Entregue" ? "good" : o.status === "Cancelado" ? "bad" : "warn"}>
+                <Pill
+                  tone={
+                    o.status === "Entregue" ? "good" : o.status === "Cancelado" ? "bad" : "warn"
+                  }
+                >
                   {o.status}
                 </Pill>
               </td>
@@ -96,7 +115,9 @@ function Pedidos() {
           ))}
         </TableShell>
         {lista.length === 0 && (
-          <p className="py-8 text-center text-sm text-muted-foreground">Nenhum pedido neste filtro.</p>
+          <p className="py-8 text-center text-sm text-muted-foreground">
+            Nenhum pedido neste filtro.
+          </p>
         )}
       </Panel>
     </>

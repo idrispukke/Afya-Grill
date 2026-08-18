@@ -3,7 +3,16 @@ import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { ActionButton, Field, PageHeader, Panel, Pill, Row, TableShell, brl } from "@/components/admin/AdminUI";
+import {
+  ActionButton,
+  Field,
+  PageHeader,
+  Panel,
+  Pill,
+  Row,
+  TableShell,
+  brl,
+} from "@/components/admin/AdminUI";
 import { useAdmin } from "@/lib/admin";
 
 export const Route = createFileRoute("/admin/cardapio")({

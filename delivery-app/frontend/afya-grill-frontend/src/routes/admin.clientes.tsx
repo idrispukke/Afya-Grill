@@ -1,6 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { ActionButton, PageHeader, Panel, Pill, Row, StatCard, TableShell, brl } from "@/components/admin/AdminUI";
+import {
+  ActionButton,
+  PageHeader,
+  Panel,
+  Pill,
+  Row,
+  StatCard,
+  TableShell,
+  brl,
+} from "@/components/admin/AdminUI";
 import { useAdmin } from "@/lib/admin";
 
 export const Route = createFileRoute("/admin/clientes")({

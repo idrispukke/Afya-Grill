@@ -2,7 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Download } from "lucide-react";
 import { toast } from "sonner";
-import { ActionButton, Bars, PageHeader, Panel, Row, StatCard, TableShell, brl } from "@/components/admin/AdminUI";
+import {
+  ActionButton,
+  Bars,
+  PageHeader,
+  Panel,
+  Row,
+  StatCard,
+  TableShell,
+  brl,
+} from "@/components/admin/AdminUI";
 import { revenueSeries } from "@/data/admin";
 import { useAdmin } from "@/lib/admin";
 
@@ -53,7 +62,11 @@ function Relatorios() {
 
       <div className="mb-4 grid gap-4 sm:grid-cols-3">
         <StatCard index={0} label={`Receita (${periodo})`} value={brl(total)} />
-        <StatCard index={1} label="Pedidos" value={Math.round(148 * fator).toLocaleString("pt-BR")} />
+        <StatCard
+          index={1}
+          label="Pedidos"
+          value={Math.round(148 * fator).toLocaleString("pt-BR")}
+        />
         <StatCard index={2} label="Tempo médio" value="32 min" delta="-4 min vs período anterior" />
       </div>
 

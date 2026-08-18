@@ -101,5 +101,4 @@ export const dishes: Dish[] = [
 
 export const categories = ["Todos", "Destaques", "Principais", "Doces", "Drinks"] as const;
 
-export const brl = (v: number) =>
-  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+export const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });

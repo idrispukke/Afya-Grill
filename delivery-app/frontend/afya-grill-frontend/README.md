@@ -27,14 +27,14 @@ A aplicação sobe em **http://localhost:8080**.
 
 ### Scripts disponíveis
 
-| Comando            | O que faz                                              |
-| ------------------ | ------------------------------------------------------- |
-| `npm run dev`       | Sobe o servidor de desenvolvimento (porta 8080, HMR)     |
-| `npm run build`     | Gera o build de produção em `.output/`                   |
+| Comando             | O que faz                                                 |
+| ------------------- | --------------------------------------------------------- |
+| `npm run dev`       | Sobe o servidor de desenvolvimento (porta 8080, HMR)      |
+| `npm run build`     | Gera o build de produção em `.output/`                    |
 | `npm run build:dev` | Gera um build com as flags de desenvolvimento habilitadas |
-| `npm run preview`   | Serve o build de produção localmente                     |
-| `npm run lint`      | Roda o ESLint                                            |
-| `npm run format`    | Formata o projeto com Prettier                           |
+| `npm run preview`   | Serve o build de produção localmente                      |
+| `npm run lint`      | Roda o ESLint                                             |
+| `npm run format`    | Formata o projeto com Prettier                            |
 
 ## Estrutura do projeto
 

@@ -3,7 +3,15 @@ import { AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { ActionButton, Field, PageHeader, Panel, Pill, Row, TableShell } from "@/components/admin/AdminUI";
+import {
+  ActionButton,
+  Field,
+  PageHeader,
+  Panel,
+  Pill,
+  Row,
+  TableShell,
+} from "@/components/admin/AdminUI";
 import { useAdmin } from "@/lib/admin";
 
 export const Route = createFileRoute("/admin/cupons")({
@@ -76,7 +84,12 @@ function Cupons() {
               toast.success("Cupom criado");
             }}
           >
-            <Field label="Código" value={codigo} onChange={(e) => setCodigo(e.target.value)} required />
+            <Field
+              label="Código"
+              value={codigo}
+              onChange={(e) => setCodigo(e.target.value)}
+              required
+            />
             <Field
               label="Desconto (%)"
               type="number"

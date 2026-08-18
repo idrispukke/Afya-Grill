@@ -61,8 +61,16 @@ function Configuracoes() {
           <div className="space-y-3">
             <Field label="Taxa de entrega padrão (R$)" type="number" defaultValue="9.9" />
             <Field label="Pedido mínimo (R$)" type="number" defaultValue="35" />
-            <Toggle label="Aceitar pedidos" hint="Desligue para pausar toda a plataforma" defaultOn />
-            <Toggle label="Frete grátis acima de R$ 120" hint="Aplicado automaticamente" defaultOn />
+            <Toggle
+              label="Aceitar pedidos"
+              hint="Desligue para pausar toda a plataforma"
+              defaultOn
+            />
+            <Toggle
+              label="Frete grátis acima de R$ 120"
+              hint="Aplicado automaticamente"
+              defaultOn
+            />
             <Toggle label="Notificações por e-mail" hint="Resumo diário às 23h" />
           </div>
         </Panel>

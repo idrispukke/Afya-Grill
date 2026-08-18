@@ -1,6 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { ActionButton, Bars, PageHeader, Panel, Pill, Row, StatCard, TableShell, brl } from "@/components/admin/AdminUI";
+import {
+  ActionButton,
+  Bars,
+  PageHeader,
+  Panel,
+  Pill,
+  Row,
+  StatCard,
+  TableShell,
+  brl,
+} from "@/components/admin/AdminUI";
 import { revenueSeries } from "@/data/admin";
 import { useAdmin } from "@/lib/admin";
 
