@@ -318,22 +318,56 @@ function Home() {
           </h2>
         </Reveal>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <Reveal delay={0.06}>
+          <div className="relative mt-10 overflow-hidden rounded-2xl border border-border bg-surface/60 py-3">
+            <div className="flex w-max animate-marquee gap-10 whitespace-nowrap">
+              {Array.from({ length: 2 }).map((_, r) => (
+                <div key={r} className="flex gap-10">
+                  {steps.map((s, i) => (
+                    <span
+                      key={`${r}-${s.title}`}
+                      className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-muted-foreground"
+                    >
+                      <span className="text-primary">0{i + 1}</span> {s.title}
+                      <ArrowRight className="h-3 w-3 text-primary" />
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+
+        <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {steps.map((s, i) => (
             <Reveal key={s.title} delay={i * 0.08}>
-              <div className="relative h-full rounded-3xl border border-border bg-surface p-7 shadow-soft">
+              <motion.div
+                whileHover={{ y: -10, scale: 1.02 }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                className="group relative h-full overflow-hidden rounded-3xl border border-border bg-surface p-7 shadow-soft transition-shadow duration-300 hover:shadow-ember"
+              >
+                <div className="pointer-events-none absolute inset-x-0 -top-px h-px overflow-hidden">
+                  <span className="absolute inset-y-0 w-1/3 animate-shimmer bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 group-hover:opacity-100" />
+                </div>
                 <span className="absolute right-6 top-6 font-display text-5xl text-border">
                   0{i + 1}
                 </span>
-                <span
-                  className="inline-flex h-12 w-12 items-center justify-center rounded-2xl text-primary-foreground shadow-ember"
-                  style={{ background: "var(--gradient-ember)" }}
-                >
-                  <s.icon className="h-5 w-5" />
+                <span className="relative inline-flex h-12 w-12 items-center justify-center">
+                  <span className="absolute h-12 w-12 rounded-2xl border border-primary/40 animate-ring" />
+                  <span
+                    className="absolute h-12 w-12 rounded-2xl border border-gold/40 animate-ring"
+                    style={{ animationDelay: "0.7s" }}
+                  />
+                  <span
+                    className="relative inline-flex h-12 w-12 animate-float items-center justify-center rounded-2xl text-primary-foreground shadow-ember"
+                    style={{ background: "var(--gradient-ember)" }}
+                  >
+                    <s.icon className="h-5 w-5" />
+                  </span>
                 </span>
                 <h3 className="mt-6 text-2xl">{s.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.text}</p>
-              </div>
+              </motion.div>
             </Reveal>
           ))}
         </div>
@@ -373,9 +407,9 @@ function Home() {
               <div className="pointer-events-none absolute -inset-10 bg-glow opacity-70" />
               <motion.div
                 whileHover={{ y: -6 }}
-                className="relative flex flex-col items-center gap-5 rounded-[2rem] border border-border bg-surface p-8 shadow-ember"
+                className="relative mt-3 flex flex-col items-center gap-5 rounded-[2rem] border border-border bg-surface p-8 shadow-ember"
               >
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full glass px-4 py-1 text-[11px] uppercase tracking-widest">
+                <span className="absolute -top-3 left-1/2 w-max -translate-x-1/2 whitespace-nowrap rounded-full glass px-4 py-1 text-[11px] uppercase tracking-widest">
                   Mesa 12 · Brasa & Cia
                 </span>
                 <div className="rounded-2xl bg-white p-3">
