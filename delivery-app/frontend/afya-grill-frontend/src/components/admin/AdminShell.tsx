@@ -18,6 +18,8 @@ import {
   Menu,
   X,
   Bell,
+  CalendarCheck2,
+  QrCode,
 } from "lucide-react";
 import logo from "@/assets/afya-grill-logo.png";
 import { useAdmin } from "@/lib/admin";
@@ -25,7 +27,9 @@ import { useAdmin } from "@/lib/admin";
 const nav = [
   { to: "/admin", label: "Visão geral", icon: LayoutDashboard, exact: true },
   { to: "/admin/pedidos", label: "Pedidos", icon: ReceiptText },
+  { to: "/admin/reservas", label: "Reservas", icon: CalendarCheck2 },
   { to: "/admin/cardapio", label: "Cardápio", icon: UtensilsCrossed },
+  { to: "/admin/qrcode", label: "Cardápio digital & QR", icon: QrCode },
   { to: "/admin/casas", label: "Casas parceiras", icon: Store },
   { to: "/admin/clientes", label: "Clientes", icon: Users },
   { to: "/admin/entregadores", label: "Entregadores", icon: Bike },
