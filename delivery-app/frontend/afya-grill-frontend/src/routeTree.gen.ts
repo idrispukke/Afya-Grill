@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as CardapioRouteImport } from './routes/cardapio'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
+import { Route as ReservasRouteImport } from './routes/reservas'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAvaliacoesRouteImport } from './routes/admin.avaliacoes'
 import { Route as AdminCardapioRouteImport } from './routes/admin.cardapio'
@@ -23,7 +25,9 @@ import { Route as AdminEntregadoresRouteImport } from './routes/admin.entregador
 import { Route as AdminEquipeRouteImport } from './routes/admin.equipe'
 import { Route as AdminFinanceiroRouteImport } from './routes/admin.financeiro'
 import { Route as AdminPedidosRouteImport } from './routes/admin.pedidos'
+import { Route as AdminQrcodeRouteImport } from './routes/admin.qrcode'
 import { Route as AdminRelatoriosRouteImport } from './routes/admin.relatorios'
+import { Route as AdminReservasRouteImport } from './routes/admin.reservas'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -35,9 +39,19 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CardapioRoute = CardapioRouteImport.update({
+  id: '/cardapio',
+  path: '/cardapio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CarrinhoRoute = CarrinhoRouteImport.update({
   id: '/carrinho',
   path: '/carrinho',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReservasRoute = ReservasRouteImport.update({
+  id: '/reservas',
+  path: '/reservas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -95,16 +109,28 @@ const AdminPedidosRoute = AdminPedidosRouteImport.update({
   path: '/pedidos',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminQrcodeRoute = AdminQrcodeRouteImport.update({
+  id: '/qrcode',
+  path: '/qrcode',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminRelatoriosRoute = AdminRelatoriosRouteImport.update({
   id: '/relatorios',
   path: '/relatorios',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReservasRoute = AdminReservasRouteImport.update({
+  id: '/reservas',
+  path: '/reservas',
   getParentRoute: () => AdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
+  '/reservas': typeof ReservasRoute
   '/admin/avaliacoes': typeof AdminAvaliacoesRoute
   '/admin/cardapio': typeof AdminCardapioRoute
   '/admin/casas': typeof AdminCasasRoute
@@ -115,12 +141,16 @@ export interface FileRoutesByFullPath {
   '/admin/equipe': typeof AdminEquipeRoute
   '/admin/financeiro': typeof AdminFinanceiroRoute
   '/admin/pedidos': typeof AdminPedidosRoute
+  '/admin/qrcode': typeof AdminQrcodeRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
+  '/admin/reservas': typeof AdminReservasRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
+  '/reservas': typeof ReservasRoute
   '/admin/avaliacoes': typeof AdminAvaliacoesRoute
   '/admin/cardapio': typeof AdminCardapioRoute
   '/admin/casas': typeof AdminCasasRoute
@@ -131,14 +161,18 @@ export interface FileRoutesByTo {
   '/admin/equipe': typeof AdminEquipeRoute
   '/admin/financeiro': typeof AdminFinanceiroRoute
   '/admin/pedidos': typeof AdminPedidosRoute
+  '/admin/qrcode': typeof AdminQrcodeRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
+  '/admin/reservas': typeof AdminReservasRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
+  '/reservas': typeof ReservasRoute
   '/admin/avaliacoes': typeof AdminAvaliacoesRoute
   '/admin/cardapio': typeof AdminCardapioRoute
   '/admin/casas': typeof AdminCasasRoute
@@ -149,7 +183,9 @@ export interface FileRoutesById {
   '/admin/equipe': typeof AdminEquipeRoute
   '/admin/financeiro': typeof AdminFinanceiroRoute
   '/admin/pedidos': typeof AdminPedidosRoute
+  '/admin/qrcode': typeof AdminQrcodeRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
+  '/admin/reservas': typeof AdminReservasRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -157,7 +193,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/cardapio'
     | '/carrinho'
+    | '/reservas'
     | '/admin/avaliacoes'
     | '/admin/cardapio'
     | '/admin/casas'
@@ -168,12 +206,16 @@ export interface FileRouteTypes {
     | '/admin/equipe'
     | '/admin/financeiro'
     | '/admin/pedidos'
+    | '/admin/qrcode'
     | '/admin/relatorios'
+    | '/admin/reservas'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/cardapio'
     | '/carrinho'
+    | '/reservas'
     | '/admin/avaliacoes'
     | '/admin/cardapio'
     | '/admin/casas'
@@ -184,13 +226,17 @@ export interface FileRouteTypes {
     | '/admin/equipe'
     | '/admin/financeiro'
     | '/admin/pedidos'
+    | '/admin/qrcode'
     | '/admin/relatorios'
+    | '/admin/reservas'
     | '/admin'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/cardapio'
     | '/carrinho'
+    | '/reservas'
     | '/admin/avaliacoes'
     | '/admin/cardapio'
     | '/admin/casas'
@@ -201,14 +247,18 @@ export interface FileRouteTypes {
     | '/admin/equipe'
     | '/admin/financeiro'
     | '/admin/pedidos'
+    | '/admin/qrcode'
     | '/admin/relatorios'
+    | '/admin/reservas'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  CardapioRoute: typeof CardapioRoute
   CarrinhoRoute: typeof CarrinhoRoute
+  ReservasRoute: typeof ReservasRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -227,11 +277,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cardapio': {
+      id: '/cardapio'
+      path: '/cardapio'
+      fullPath: '/cardapio'
+      preLoaderRoute: typeof CardapioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/carrinho': {
       id: '/carrinho'
       path: '/carrinho'
       fullPath: '/carrinho'
       preLoaderRoute: typeof CarrinhoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reservas': {
+      id: '/reservas'
+      path: '/reservas'
+      fullPath: '/reservas'
+      preLoaderRoute: typeof ReservasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -311,11 +375,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPedidosRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/qrcode': {
+      id: '/admin/qrcode'
+      path: '/qrcode'
+      fullPath: '/admin/qrcode'
+      preLoaderRoute: typeof AdminQrcodeRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/relatorios': {
       id: '/admin/relatorios'
       path: '/relatorios'
       fullPath: '/admin/relatorios'
       preLoaderRoute: typeof AdminRelatoriosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/reservas': {
+      id: '/admin/reservas'
+      path: '/reservas'
+      fullPath: '/admin/reservas'
+      preLoaderRoute: typeof AdminReservasRouteImport
       parentRoute: typeof AdminRoute
     }
   }
@@ -332,7 +410,9 @@ interface AdminRouteChildren {
   AdminEquipeRoute: typeof AdminEquipeRoute
   AdminFinanceiroRoute: typeof AdminFinanceiroRoute
   AdminPedidosRoute: typeof AdminPedidosRoute
+  AdminQrcodeRoute: typeof AdminQrcodeRoute
   AdminRelatoriosRoute: typeof AdminRelatoriosRoute
+  AdminReservasRoute: typeof AdminReservasRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -347,7 +427,9 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminEquipeRoute: AdminEquipeRoute,
   AdminFinanceiroRoute: AdminFinanceiroRoute,
   AdminPedidosRoute: AdminPedidosRoute,
+  AdminQrcodeRoute: AdminQrcodeRoute,
   AdminRelatoriosRoute: AdminRelatoriosRoute,
+  AdminReservasRoute: AdminReservasRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
@@ -356,7 +438,9 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  CardapioRoute: CardapioRoute,
   CarrinhoRoute: CarrinhoRoute,
+  ReservasRoute: ReservasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
