@@ -16,6 +16,7 @@ import {
   Utensils,
 } from "lucide-react";
 import { useRef, useState } from "react";
+import { QRCodeSVG } from "qrcode.react";
 import heroImg from "@/assets/hero.jpg";
 import { Loader } from "@/components/Loader";
 import { Navbar } from "@/components/Navbar";
@@ -219,10 +220,7 @@ function Home() {
           {Array.from({ length: 2 }).map((_, r) => (
             <div key={r} className="flex gap-10">
               {houses.map((h) => (
-                <span
-                  key={`${r}-${h.name}`}
-                  className="font-display text-xl text-muted-foreground"
-                >
+                <span key={`${r}-${h.name}`} className="font-display text-xl text-muted-foreground">
                   {h.name} <span className="text-primary">•</span>
                 </span>
               ))}
@@ -341,6 +339,62 @@ function Home() {
         </div>
       </section>
 
+      {/* CARDÁPIO DIGITAL / QR */}
+      <section className="mx-auto max-w-6xl px-4 py-28">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          <Reveal>
+            <p className="text-xs uppercase tracking-[0.35em] text-primary">na sua mesa</p>
+            <h2 className="mt-4 max-w-xl text-4xl sm:text-5xl">
+              Escaneie o QR Code <span className="text-gradient">e peça na hora</span>
+            </h2>
+            <p className="mt-5 max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">
+              Cada mesa das casas parceiras tem o próprio QR Code. Aponte a câmera, veja o cardápio
+              completo, chame o garçom ou peça a conta — sem esperar ninguém passar na mesa.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                to="/cardapio"
+                className="inline-flex items-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-ember transition-transform hover:scale-105"
+                style={{ background: "var(--gradient-ember)" }}
+              >
+                Ver cardápio digital <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                to="/reservas"
+                className="inline-flex items-center gap-2 rounded-2xl border border-border px-6 py-3.5 text-sm font-semibold transition-colors hover:bg-secondary"
+              >
+                Reservar uma mesa
+              </Link>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.12}>
+            <div className="relative mx-auto flex max-w-xs items-center justify-center">
+              <div className="pointer-events-none absolute -inset-10 bg-glow opacity-70" />
+              <motion.div
+                whileHover={{ y: -6 }}
+                className="relative flex flex-col items-center gap-5 rounded-[2rem] border border-border bg-surface p-8 shadow-ember"
+              >
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full glass px-4 py-1 text-[11px] uppercase tracking-widest">
+                  Mesa 12 · Brasa & Cia
+                </span>
+                <div className="rounded-2xl bg-white p-3">
+                  <QRCodeSVG
+                    value="https://afyagrill.com.br/cardapio?casa=brasa-cia&mesa=12"
+                    size={168}
+                    level="M"
+                    fgColor="#1a1108"
+                  />
+                </div>
+                <p className="text-center text-xs text-muted-foreground">
+                  Aponte a câmera do celular para o código
+                </p>
+              </motion.div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* DEPOIMENTOS */}
       <section className="border-y border-border bg-surface/40 py-28">
         <div className="mx-auto max-w-6xl px-4">
@@ -394,6 +448,12 @@ function Home() {
               >
                 Fazer meu pedido
               </a>
+              <Link
+                to="/reservas"
+                className="rounded-2xl border border-border px-7 py-4 text-sm font-semibold transition-colors hover:bg-secondary"
+              >
+                Reservar uma mesa
+              </Link>
               <Link
                 to="/carrinho"
                 className="rounded-2xl border border-border px-7 py-4 text-sm font-semibold transition-colors hover:bg-secondary"
