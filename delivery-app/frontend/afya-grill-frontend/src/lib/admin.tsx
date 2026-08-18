@@ -15,8 +15,10 @@ import {
   seedOrders,
   seedPayouts,
   seedProducts,
+  seedReservations,
   seedReviews,
   seedStaff,
+  seedTables,
   type AdminCoupon,
   type AdminCourier,
   type AdminCustomer,
@@ -24,9 +26,12 @@ import {
   type AdminOrder,
   type AdminPayout,
   type AdminProduct,
+  type AdminReservation,
   type AdminReview,
   type AdminStaff,
+  type AdminTable,
   type OrderStatus,
+  type ReservationStatus,
 } from "@/data/admin";
 
 const SESSION_KEY = "afya-admin-session-v1";
@@ -70,6 +75,14 @@ type AdminCtx = {
 
   payouts: AdminPayout[];
   payPayout: (id: string) => void;
+
+  reservations: AdminReservation[];
+  addReservation: (
+    r: Omit<AdminReservation, "id" | "codigo" | "status" | "criadoEm">,
+  ) => AdminReservation;
+  setReservationStatus: (id: string, status: ReservationStatus) => void;
+
+  tables: AdminTable[];
 };
 
 const Ctx = createContext<AdminCtx | null>(null);
@@ -89,6 +102,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const [reviews, setReviews] = useState(seedReviews);
   const [staff, setStaff] = useState(seedStaff);
   const [payouts, setPayouts] = useState(seedPayouts);
+  const [reservations, setReservations] = useState(seedReservations);
+  const [tables] = useState(seedTables);
 
   useEffect(() => {
     try {
@@ -163,8 +178,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       coupons,
       toggleCoupon: (id) =>
         setCoupons((prev) => prev.map((c) => (c.id === id ? { ...c, ativo: !c.ativo } : c))),
-      addCoupon: (c) =>
-        setCoupons((prev) => [...prev, { ...c, usos: 0, id: `k-${Date.now()}` }]),
+      addCoupon: (c) => setCoupons((prev) => [...prev, { ...c, usos: 0, id: `k-${Date.now()}` }]),
       removeCoupon: (id) => setCoupons((prev) => prev.filter((c) => c.id !== id)),
       reviews,
       answerReview: (id) =>
@@ -175,6 +189,21 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       payouts,
       payPayout: (id) =>
         setPayouts((prev) => prev.map((p) => (p.id === id ? { ...p, status: "Pago" } : p))),
+      reservations,
+      addReservation: (r) => {
+        const created: AdminReservation = {
+          ...r,
+          id: `res-${Date.now()}`,
+          codigo: `AFY-R${Math.floor(400 + Math.random() * 599)}`,
+          status: "Pendente",
+          criadoEm: new Date().toLocaleString("pt-BR"),
+        };
+        setReservations((prev) => [created, ...prev]);
+        return created;
+      },
+      setReservationStatus: (id, status) =>
+        setReservations((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r))),
+      tables,
     }),
     [
       ready,
@@ -190,6 +219,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       reviews,
       staff,
       payouts,
+      reservations,
+      tables,
     ],
   );
 
