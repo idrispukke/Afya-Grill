@@ -117,7 +117,7 @@ function Reservas() {
             <input
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              placeholder="Buscar código, cliente ou casa"
+              placeholder="Buscar código, cliente ou filial"
               className="ml-auto w-full rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary sm:w-64"
             />
           </div>
@@ -126,7 +126,7 @@ function Reservas() {
             head={[
               "Código",
               "Cliente",
-              "Casa",
+              "Filial",
               "Data / hora",
               "Pessoas",
               "Origem",
