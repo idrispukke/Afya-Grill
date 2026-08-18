@@ -1,13 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import {
   ArrowLeft,
+  ArrowRight,
+  Calendar as CalendarIcon,
   CalendarCheck2,
   CalendarPlus,
   Check,
   Minus,
   Plus,
   Sparkles,
+  Store,
+  UserCircle2,
   UtensilsCrossed,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -23,7 +27,7 @@ export const Route = createFileRoute("/reservas")({
       { title: "Reservar mesa — Afya Grill" },
       {
         name: "description",
-        content: "Reserve sua mesa em uma das casas parceiras da Afya Grill em poucos passos.",
+        content: "Reserve sua mesa em uma das filiais da Afya Grill em poucos passos.",
       },
     ],
   }),
@@ -32,6 +36,12 @@ export const Route = createFileRoute("/reservas")({
 
 const horariosAlmoco = ["12:00", "12:30", "13:00", "13:30", "14:00", "14:30"];
 const horariosJantar = ["19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00"];
+
+const stepsInfo = [
+  { label: "Filial", icon: Store },
+  { label: "Data e horário", icon: CalendarIcon },
+  { label: "Seus dados", icon: UserCircle2 },
+] as const;
 
 function formatDate(d: Date) {
   return d.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" });
@@ -44,10 +54,49 @@ function isoDate(d: Date) {
   return `${y}-${m}-${day}`;
 }
 
+function Stepper({ step }: { step: number }) {
+  return (
+    <ol className="relative mt-8 flex items-center justify-between">
+      {stepsInfo.map((s, i) => {
+        const n = i + 1;
+        const done = step > n;
+        const active = step === n;
+        return (
+          <li key={s.label} className="relative flex flex-1 items-center last:flex-none">
+            <div className="flex flex-col items-center gap-2">
+              <span
+                className={`flex h-10 w-10 items-center justify-center rounded-full border text-sm font-semibold transition-colors ${
+                  done || active
+                    ? "border-transparent text-primary-foreground"
+                    : "border-border bg-surface text-muted-foreground"
+                }`}
+                style={done || active ? { background: "var(--gradient-ember)" } : undefined}
+              >
+                {done ? <Check className="h-4 w-4" /> : <s.icon className="h-4 w-4" />}
+              </span>
+              <span
+                className={`hidden text-[11px] uppercase tracking-widest sm:block ${
+                  active ? "text-foreground" : "text-muted-foreground"
+                }`}
+              >
+                {s.label}
+              </span>
+            </div>
+            {n < stepsInfo.length && (
+              <span className={`mx-2 h-px flex-1 sm:mx-3 ${done ? "bg-primary" : "bg-border"}`} />
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
 function ReservasPage() {
   const { houses, addReservation } = useAdmin();
-  const casasAtivas = useMemo(() => houses.filter((h) => h.ativo), [houses]);
+  const filiaisAtivas = useMemo(() => houses.filter((h) => h.ativo), [houses]);
 
+  const [step, setStep] = useState(1);
   const [casa, setCasa] = useState<string>("");
   const [data, setData] = useState<Date | undefined>(undefined);
   const [hora, setHora] = useState<string>("");
@@ -58,11 +107,13 @@ function ReservasPage() {
   const [observacao, setObservacao] = useState("");
   const [confirmada, setConfirmada] = useState<AdminReservation | null>(null);
 
-  const pronto = casa && data && hora && nome.trim() && telefone.trim();
+  const podeAvancarStep1 = !!casa;
+  const podeAvancarStep2 = !!data && !!hora;
+  const podeConfirmar = nome.trim().length > 0 && telefone.trim().length > 0;
 
   const submit = () => {
-    if (!pronto || !data) {
-      toast.error("Preencha casa, data, horário, nome e telefone.");
+    if (!podeConfirmar || !data || !hora || !casa) {
+      toast.error("Preencha nome e telefone para confirmar.");
       return;
     }
     const created = addReservation({
@@ -134,7 +185,7 @@ function ReservasPage() {
             <dl className="relative mx-auto mt-8 grid max-w-sm grid-cols-2 gap-4 text-left text-sm">
               <div className="rounded-xl bg-background px-4 py-3">
                 <dt className="text-[11px] uppercase tracking-widest text-muted-foreground">
-                  Casa
+                  Filial
                 </dt>
                 <dd className="mt-1 font-medium">{confirmada.casa}</dd>
               </div>
@@ -189,169 +240,254 @@ function ReservasPage() {
               Sua mesa <span className="text-gradient">te espera</span>
             </h1>
             <p className="relative mt-2 max-w-lg text-sm text-muted-foreground">
-              Escolha a casa, o dia e o horário. Confirmamos em minutos.
+              Três passos rápidos: filial, horário e seus dados. Confirmamos em minutos.
             </p>
 
-            <div className="relative mt-8 space-y-6">
-              <section>
-                <h2 className="mb-3 text-xs uppercase tracking-[0.28em] text-primary">
-                  1. Escolha a casa
-                </h2>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {casasAtivas.map((h) => (
-                    <button
-                      key={h.id}
-                      onClick={() => setCasa(h.nome)}
-                      className={`rounded-2xl border p-4 text-left transition-colors ${
-                        casa === h.nome
-                          ? "border-primary bg-surface"
-                          : "border-border bg-surface/60 hover:border-primary/40"
-                      }`}
-                    >
-                      <p className="font-display text-lg">{h.nome}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {h.cozinha} · {h.bairro}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              </section>
+            <Stepper step={step} />
 
-              <section>
-                <h2 className="mb-3 text-xs uppercase tracking-[0.28em] text-primary">
-                  2. Dia e horário
-                </h2>
-                <div className="grid gap-4 sm:grid-cols-[auto_1fr]">
-                  <div className="w-fit rounded-2xl border border-border bg-surface p-2">
-                    <Calendar
-                      mode="single"
-                      selected={data}
-                      onSelect={setData}
-                      disabled={{ before: new Date() }}
-                    />
-                  </div>
-                  <div className="rounded-2xl border border-border bg-surface p-4">
-                    {data ? (
-                      <p className="mb-3 text-xs text-muted-foreground">{formatDate(data)}</p>
-                    ) : (
-                      <p className="mb-3 text-xs text-muted-foreground">
-                        Selecione um dia no calendário
-                      </p>
-                    )}
-                    <p className="mb-2 text-[11px] uppercase tracking-widest text-muted-foreground">
-                      Almoço
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {horariosAlmoco.map((h) => (
+            <div className="relative mt-8 min-h-[360px]">
+              <AnimatePresence mode="wait">
+                {step === 1 && (
+                  <motion.section
+                    key="step1"
+                    initial={{ opacity: 0, x: 24 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -24 }}
+                    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <h2 className="mb-3 text-xs uppercase tracking-[0.28em] text-primary">
+                      Em qual filial?
+                    </h2>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {filiaisAtivas.map((h) => (
                         <button
-                          key={h}
-                          onClick={() => setHora(h)}
-                          className={`rounded-lg px-3 py-1.5 text-xs transition-colors ${
-                            hora === h
-                              ? "text-primary-foreground"
-                              : "bg-secondary text-muted-foreground hover:text-foreground"
+                          key={h.id}
+                          onClick={() => setCasa(h.nome)}
+                          className={`rounded-2xl border p-4 text-left transition-colors ${
+                            casa === h.nome
+                              ? "border-primary bg-surface"
+                              : "border-border bg-surface/60 hover:border-primary/40"
                           }`}
-                          style={hora === h ? { background: "var(--gradient-ember)" } : undefined}
                         >
-                          {h}
+                          <p className="font-display text-lg">{h.nome}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {h.cozinha} · {h.bairro}
+                          </p>
                         </button>
                       ))}
                     </div>
-                    <p className="mb-2 mt-4 text-[11px] uppercase tracking-widest text-muted-foreground">
-                      Jantar
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {horariosJantar.map((h) => (
-                        <button
-                          key={h}
-                          onClick={() => setHora(h)}
-                          className={`rounded-lg px-3 py-1.5 text-xs transition-colors ${
-                            hora === h
-                              ? "text-primary-foreground"
-                              : "bg-secondary text-muted-foreground hover:text-foreground"
-                          }`}
-                          style={hora === h ? { background: "var(--gradient-ember)" } : undefined}
-                        >
-                          {h}
-                        </button>
-                      ))}
+                  </motion.section>
+                )}
+
+                {step === 2 && (
+                  <motion.section
+                    key="step2"
+                    initial={{ opacity: 0, x: 24 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -24 }}
+                    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <h2 className="mb-3 text-xs uppercase tracking-[0.28em] text-primary">
+                      Dia, horário e quantas pessoas
+                    </h2>
+                    <div className="grid gap-4 sm:grid-cols-[auto_1fr]">
+                      <div className="w-fit rounded-2xl border border-border bg-surface p-2">
+                        <Calendar
+                          mode="single"
+                          selected={data}
+                          onSelect={setData}
+                          disabled={{ before: new Date() }}
+                        />
+                      </div>
+                      <div className="rounded-2xl border border-border bg-surface p-4">
+                        {data ? (
+                          <p className="mb-3 text-xs text-muted-foreground">{formatDate(data)}</p>
+                        ) : (
+                          <p className="mb-3 text-xs text-muted-foreground">
+                            Selecione um dia no calendário
+                          </p>
+                        )}
+                        <p className="mb-2 text-[11px] uppercase tracking-widest text-muted-foreground">
+                          Almoço
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {horariosAlmoco.map((h) => (
+                            <button
+                              key={h}
+                              onClick={() => setHora(h)}
+                              className={`rounded-lg px-3 py-1.5 text-xs transition-colors ${
+                                hora === h
+                                  ? "text-primary-foreground"
+                                  : "bg-secondary text-muted-foreground hover:text-foreground"
+                              }`}
+                              style={
+                                hora === h ? { background: "var(--gradient-ember)" } : undefined
+                              }
+                            >
+                              {h}
+                            </button>
+                          ))}
+                        </div>
+                        <p className="mb-2 mt-4 text-[11px] uppercase tracking-widest text-muted-foreground">
+                          Jantar
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {horariosJantar.map((h) => (
+                            <button
+                              key={h}
+                              onClick={() => setHora(h)}
+                              className={`rounded-lg px-3 py-1.5 text-xs transition-colors ${
+                                hora === h
+                                  ? "text-primary-foreground"
+                                  : "bg-secondary text-muted-foreground hover:text-foreground"
+                              }`}
+                              style={
+                                hora === h ? { background: "var(--gradient-ember)" } : undefined
+                              }
+                            >
+                              {h}
+                            </button>
+                          ))}
+                        </div>
+
+                        <p className="mb-2 mt-5 text-[11px] uppercase tracking-widest text-muted-foreground">
+                          Pessoas
+                        </p>
+                        <div className="inline-flex items-center gap-4 rounded-xl border border-border bg-background px-4 py-2">
+                          <button
+                            onClick={() => setPessoas((p) => Math.max(1, p - 1))}
+                            aria-label="Diminuir"
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-secondary"
+                          >
+                            <Minus className="h-3.5 w-3.5" />
+                          </button>
+                          <span className="w-6 text-center font-display text-xl">{pessoas}</span>
+                          <button
+                            onClick={() => setPessoas((p) => Math.min(20, p + 1))}
+                            aria-label="Aumentar"
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-secondary"
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </section>
+                  </motion.section>
+                )}
 
-              <section>
-                <h2 className="mb-3 text-xs uppercase tracking-[0.28em] text-primary">
-                  3. Quantas pessoas
-                </h2>
-                <div className="inline-flex items-center gap-4 rounded-2xl border border-border bg-surface px-5 py-3">
-                  <button
-                    onClick={() => setPessoas((p) => Math.max(1, p - 1))}
-                    aria-label="Diminuir"
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-secondary"
+                {step === 3 && (
+                  <motion.section
+                    key="step3"
+                    initial={{ opacity: 0, x: 24 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -24 }}
+                    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    <Minus className="h-3.5 w-3.5" />
-                  </button>
-                  <span className="w-10 text-center font-display text-2xl">{pessoas}</span>
-                  <button
-                    onClick={() => setPessoas((p) => Math.min(20, p + 1))}
-                    aria-label="Aumentar"
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-secondary"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                  </button>
-                  <span className="text-sm text-muted-foreground">pessoa(s)</span>
-                </div>
-              </section>
+                    <h2 className="mb-3 text-xs uppercase tracking-[0.28em] text-primary">
+                      Seus dados
+                    </h2>
 
-              <section className="grid gap-4 sm:grid-cols-2">
-                <label className="block text-xs">
-                  <span className="mb-1.5 block text-muted-foreground">Nome completo</span>
-                  <input
-                    value={nome}
-                    onChange={(e) => setNome(e.target.value)}
-                    placeholder="Seu nome"
-                    className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary"
-                  />
-                </label>
-                <label className="block text-xs">
-                  <span className="mb-1.5 block text-muted-foreground">Telefone / WhatsApp</span>
-                  <input
-                    value={telefone}
-                    onChange={(e) => setTelefone(e.target.value)}
-                    placeholder="(21) 90000-0000"
-                    className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary"
-                  />
-                </label>
-                <label className="block text-xs sm:col-span-2">
-                  <span className="mb-1.5 block text-muted-foreground">E-mail (opcional)</span>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="seu@email.com"
-                    className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary"
-                  />
-                </label>
-                <label className="block text-xs sm:col-span-2">
-                  <span className="mb-1.5 block text-muted-foreground">Observações (opcional)</span>
-                  <textarea
-                    value={observacao}
-                    onChange={(e) => setObservacao(e.target.value)}
-                    placeholder="Aniversário, restrição alimentar, cadeira de bebê..."
-                    rows={3}
-                    className="w-full resize-none rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary"
-                  />
-                </label>
-              </section>
+                    <div className="mb-5 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                      <span className="rounded-full bg-secondary px-3 py-1.5">{casa}</span>
+                      <span className="rounded-full bg-secondary px-3 py-1.5">
+                        {data && formatDate(data)}
+                      </span>
+                      <span className="rounded-full bg-secondary px-3 py-1.5">{hora}</span>
+                      <span className="rounded-full bg-secondary px-3 py-1.5">
+                        {pessoas} pessoa(s)
+                      </span>
+                    </div>
 
-              <button
-                onClick={submit}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-sm font-semibold text-primary-foreground shadow-ember transition-transform hover:scale-[1.01] active:scale-[0.99]"
-                style={{ background: "var(--gradient-ember)" }}
-              >
-                <CalendarCheck2 className="h-4 w-4" /> Confirmar reserva
-              </button>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <label className="block text-xs">
+                        <span className="mb-1.5 block text-muted-foreground">Nome completo</span>
+                        <input
+                          value={nome}
+                          onChange={(e) => setNome(e.target.value)}
+                          placeholder="Seu nome"
+                          className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+                        />
+                      </label>
+                      <label className="block text-xs">
+                        <span className="mb-1.5 block text-muted-foreground">
+                          Telefone / WhatsApp
+                        </span>
+                        <input
+                          value={telefone}
+                          onChange={(e) => setTelefone(e.target.value)}
+                          placeholder="(21) 90000-0000"
+                          className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+                        />
+                      </label>
+                      <label className="block text-xs sm:col-span-2">
+                        <span className="mb-1.5 block text-muted-foreground">
+                          E-mail (opcional)
+                        </span>
+                        <input
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="seu@email.com"
+                          className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+                        />
+                      </label>
+                      <label className="block text-xs sm:col-span-2">
+                        <span className="mb-1.5 block text-muted-foreground">
+                          Observações (opcional)
+                        </span>
+                        <textarea
+                          value={observacao}
+                          onChange={(e) => setObservacao(e.target.value)}
+                          placeholder="Aniversário, restrição alimentar, cadeira de bebê..."
+                          rows={3}
+                          className="w-full resize-none rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+                        />
+                      </label>
+                    </div>
+                  </motion.section>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <div className="relative mt-8 flex items-center justify-between gap-3">
+              {step > 1 ? (
+                <button
+                  onClick={() => setStep((s) => s - 1)}
+                  className="inline-flex items-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-medium transition-colors hover:bg-secondary"
+                >
+                  <ArrowLeft className="h-4 w-4" /> Voltar
+                </button>
+              ) : (
+                <span />
+              )}
+
+              {step < 3 ? (
+                <button
+                  onClick={() => {
+                    if (step === 1 && !podeAvancarStep1) {
+                      toast.error("Escolha uma filial para continuar.");
+                      return;
+                    }
+                    if (step === 2 && !podeAvancarStep2) {
+                      toast.error("Escolha o dia e o horário para continuar.");
+                      return;
+                    }
+                    setStep((s) => s + 1);
+                  }}
+                  className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-primary-foreground shadow-ember transition-transform hover:scale-105"
+                  style={{ background: "var(--gradient-ember)" }}
+                >
+                  Continuar <ArrowRight className="h-4 w-4" />
+                </button>
+              ) : (
+                <button
+                  onClick={submit}
+                  className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-primary-foreground shadow-ember transition-transform hover:scale-105"
+                  style={{ background: "var(--gradient-ember)" }}
+                >
+                  <CalendarCheck2 className="h-4 w-4" /> Confirmar reserva
+                </button>
+              )}
             </div>
           </>
         )}
