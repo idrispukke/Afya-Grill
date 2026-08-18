@@ -1,12 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "motion/react";
-import { ShoppingBag, Menu, X } from "lucide-react";
+import { ShoppingBag, Menu, X, CalendarCheck2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart";
 import logo from "@/assets/afya-grill-logo.png";
 
 const links = [
-  { href: "/#menu", label: "Cardápio" },
+  { href: "/cardapio", label: "Cardápio digital" },
   { href: "/#casas", label: "Casas" },
   { href: "/#como", label: "Como funciona" },
   { href: "/#contato", label: "Contato" },
@@ -62,6 +62,13 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <Link
+            to="/reservas"
+            className="hidden items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-primary-foreground shadow-ember transition-transform hover:scale-105 sm:inline-flex"
+            style={{ background: "var(--gradient-ember)" }}
+          >
+            <CalendarCheck2 className="h-4 w-4" /> Reservar
+          </Link>
+          <Link
             to="/carrinho"
             className="relative inline-flex items-center gap-2 rounded-xl bg-secondary px-4 py-2 text-sm font-medium transition-all hover:bg-accent"
           >
@@ -110,6 +117,14 @@ export function Navbar() {
                 {l.label}
               </a>
             ))}
+            <Link
+              to="/reservas"
+              onClick={() => setOpen(false)}
+              className="mt-1 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-primary-foreground"
+              style={{ background: "var(--gradient-ember)" }}
+            >
+              <CalendarCheck2 className="h-3.5 w-3.5" /> Reservar mesa
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>
