@@ -1,20 +1,33 @@
 import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { ArrowLeft, Lock, Mail, ShieldCheck } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  Loader2,
+  Lock,
+  Mail,
+  ShieldCheck,
+} from "lucide-react";
 import { toast } from "sonner";
 import logo from "@/assets/afya-grill-logo.png";
-import { useAdmin } from "@/lib/admin";
+import { ADMIN_EMAIL, ADMIN_PASSWORD, useAdmin } from "@/lib/admin";
 
 export function AdminLogin() {
   const { signIn } = useAdmin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const canSubmit = email.trim().length > 0 && password.length > 0 && !loading;
+
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!canSubmit) return;
     setLoading(true);
     setError(null);
     setTimeout(() => {
@@ -26,6 +39,12 @@ export function AdminLogin() {
       }
       toast.success("Bem-vindo ao painel Afya Grill");
     }, 550);
+  }
+
+  function fillDemoCredentials() {
+    setEmail(ADMIN_EMAIL);
+    setPassword(ADMIN_PASSWORD);
+    setError(null);
   }
 
   return (
@@ -69,6 +88,8 @@ export function AdminLogin() {
               onChange={(e) => setEmail(e.target.value)}
               type="email"
               required
+              autoFocus
+              autoComplete="email"
               placeholder="admin@afyagrill.com"
               className="w-full bg-transparent py-2.5 text-sm outline-none"
             />
@@ -82,36 +103,51 @@ export function AdminLogin() {
             <input
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              type="password"
+              type={showPassword ? "text" : "password"}
               required
+              autoComplete="current-password"
               placeholder="••••••••"
               className="w-full bg-transparent py-2.5 text-sm outline-none"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+              className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
           </div>
         </label>
 
         {error && (
           <motion.p
+            role="alert"
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: [0, -6, 6, 0] }}
-            className="mt-3 text-xs text-destructive"
+            className="mt-3 flex items-center gap-1.5 text-xs text-destructive"
           >
-            {error}
+            <AlertCircle className="h-3.5 w-3.5 shrink-0" /> {error}
           </motion.p>
         )}
 
         <button
           type="submit"
-          disabled={loading}
-          className="mt-6 w-full rounded-xl py-3 text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98] disabled:opacity-60"
+          disabled={!canSubmit}
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98] disabled:opacity-60"
           style={{ background: "var(--gradient-ember)" }}
         >
+          {loading && <Loader2 className="h-4 w-4 animate-spin" />}
           {loading ? "Verificando..." : "Entrar no painel"}
         </button>
 
-        <p className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
-          <ShieldCheck className="h-3.5 w-3.5" /> Demonstração: admin@afyagrill.com
-        </p>
+        <button
+          type="button"
+          onClick={fillDemoCredentials}
+          className="mt-4 flex w-full items-center justify-center gap-1.5 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ShieldCheck className="h-3.5 w-3.5" /> Usar credenciais de demonstração
+        </button>
       </motion.form>
     </div>
   );
