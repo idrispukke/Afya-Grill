@@ -1,11 +1,32 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
-import { Minus, Plus, Trash2, ArrowLeft, ShieldCheck, Bike } from "lucide-react";
+import {
+  Minus,
+  Plus,
+  Trash2,
+  ArrowLeft,
+  ShieldCheck,
+  Bike,
+  User,
+  Phone,
+  MapPin,
+  Home,
+  AlertCircle,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Navbar } from "@/components/Navbar";
 import { useCart } from "@/lib/cart";
 import { brl } from "@/data/menu";
+
+type DeliveryForm = {
+  nome: string;
+  telefone: string;
+  endereco: string;
+  complemento: string;
+};
+
+const emptyDeliveryForm: DeliveryForm = { nome: "", telefone: "", endereco: "", complemento: "" };
 
 export const Route = createFileRoute("/carrinho")({
   head: () => ({
@@ -32,10 +53,38 @@ function CartPage() {
   const { items, setQty, remove, clear, subtotal, count } = useCart();
   const [coupon, setCoupon] = useState("");
   const [applied, setApplied] = useState(false);
+  const [form, setForm] = useState<DeliveryForm>(emptyDeliveryForm);
+  const [formErrors, setFormErrors] = useState<Partial<Record<keyof DeliveryForm, boolean>>>({});
 
   const delivery = subtotal > 0 ? (subtotal >= 150 ? 0 : 12.9) : 0;
   const discount = applied ? subtotal * 0.1 : 0;
   const total = subtotal + delivery - discount;
+
+  function updateForm<K extends keyof DeliveryForm>(key: K, value: DeliveryForm[K]) {
+    setForm((prev) => ({ ...prev, [key]: value }));
+    setFormErrors((prev) => ({ ...prev, [key]: false }));
+  }
+
+  function onFinalizarPedido() {
+    const errors: Partial<Record<keyof DeliveryForm, boolean>> = {
+      nome: form.nome.trim().length === 0,
+      telefone: form.telefone.trim().length < 8,
+      endereco: form.endereco.trim().length === 0,
+    };
+    if (Object.values(errors).some(Boolean)) {
+      setFormErrors(errors);
+      toast.error("Confirma seus dados de entrega antes de finalizar");
+      return;
+    }
+    toast.success("Pedido enviado para a cozinha!", {
+      description: `Entrega para ${form.nome} em ${form.endereco}${form.complemento ? `, ${form.complemento}` : ""}.`,
+    });
+    clear();
+    setForm(emptyDeliveryForm);
+    setFormErrors({});
+    setApplied(false);
+    setCoupon("");
+  }
 
   return (
     <div className="min-h-screen">
@@ -162,6 +211,84 @@ function CartPage() {
             >
               <h2 className="font-display text-2xl">Resumo</h2>
 
+              <div className="mt-5 space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  Dados de entrega
+                </p>
+
+                <label className="block text-xs">
+                  <div
+                    className={`flex items-center gap-2 rounded-xl border bg-background px-3 focus-within:border-primary ${
+                      formErrors.nome ? "border-destructive" : "border-input"
+                    }`}
+                  >
+                    <User className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <input
+                      value={form.nome}
+                      onChange={(e) => updateForm("nome", e.target.value)}
+                      placeholder="Nome completo"
+                      autoComplete="name"
+                      className="w-full bg-transparent py-2.5 text-sm outline-none"
+                    />
+                  </div>
+                </label>
+
+                <label className="block text-xs">
+                  <div
+                    className={`flex items-center gap-2 rounded-xl border bg-background px-3 focus-within:border-primary ${
+                      formErrors.telefone ? "border-destructive" : "border-input"
+                    }`}
+                  >
+                    <Phone className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <input
+                      value={form.telefone}
+                      onChange={(e) => updateForm("telefone", e.target.value)}
+                      type="tel"
+                      placeholder="Telefone com DDD"
+                      autoComplete="tel"
+                      className="w-full bg-transparent py-2.5 text-sm outline-none"
+                    />
+                  </div>
+                </label>
+
+                <label className="block text-xs">
+                  <div
+                    className={`flex items-center gap-2 rounded-xl border bg-background px-3 focus-within:border-primary ${
+                      formErrors.endereco ? "border-destructive" : "border-input"
+                    }`}
+                  >
+                    <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <input
+                      value={form.endereco}
+                      onChange={(e) => updateForm("endereco", e.target.value)}
+                      placeholder="Endereço (rua, número e bairro)"
+                      autoComplete="street-address"
+                      className="w-full bg-transparent py-2.5 text-sm outline-none"
+                    />
+                  </div>
+                </label>
+
+                <label className="block text-xs">
+                  <div className="flex items-center gap-2 rounded-xl border border-input bg-background px-3 focus-within:border-primary">
+                    <Home className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <input
+                      value={form.complemento}
+                      onChange={(e) => updateForm("complemento", e.target.value)}
+                      placeholder="Complemento (opcional)"
+                      autoComplete="address-line2"
+                      className="w-full bg-transparent py-2.5 text-sm outline-none"
+                    />
+                  </div>
+                </label>
+
+                {Object.values(formErrors).some(Boolean) && (
+                  <p className="flex items-center gap-1.5 text-xs text-destructive">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0" /> Preencha nome, telefone e
+                    endereço para continuar
+                  </p>
+                )}
+              </div>
+
               <div className="mt-5 flex gap-2">
                 <input
                   value={coupon}
@@ -208,7 +335,7 @@ function CartPage() {
               </dl>
 
               <button
-                onClick={() => toast.success("Pedido enviado para a cozinha!")}
+                onClick={onFinalizarPedido}
                 className="mt-6 w-full rounded-xl py-3.5 text-sm font-semibold text-primary-foreground shadow-ember transition-transform hover:scale-[1.02] active:scale-[0.99]"
                 style={{ background: "var(--gradient-ember)" }}
               >
