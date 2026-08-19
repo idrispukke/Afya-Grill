@@ -7,12 +7,12 @@ Plataforma de restaurantes com curadoria: peça de cozinhas autorais, acompanhe 
 - [TanStack Start](https://tanstack.com/start) (React 19 + SSR) sobre [Vite](https://vite.dev)
 - [TanStack Router](https://tanstack.com/router) e [TanStack Query](https://tanstack.com/query)
 - Tailwind CSS v4 + Radix UI
-- Build/deploy via [Nitro](https://nitro.build) (preset `cloudflare-module`)
+- Build/deploy via [Nitro](https://nitro.build) — detecta o preset automaticamente (`vercel` na Vercel, `cloudflare-module` como fallback local)
 
 ## Requisitos
 
 - Node.js 20+ — [instale com nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-- npm (ou `bun`, que também é suportado — veja `bun.lock`)
+- npm (gerenciador de pacotes do projeto — veja `package-lock.json`)
 
 ## Como rodar
 
