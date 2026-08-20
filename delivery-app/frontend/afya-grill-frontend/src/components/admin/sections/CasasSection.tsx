@@ -1,32 +1,22 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { Star } from "lucide-react";
 import { toast } from "sonner";
 import { ActionButton, PageHeader, Pill } from "@/components/admin/AdminUI";
 import { useAdmin } from "@/lib/admin";
 
-export const Route = createFileRoute("/admin/casas")({
-  head: () => ({
-    meta: [
-      { title: "Casas parceiras — Painel Afya Grill" },
-      { name: "description", content: "Restaurantes parceiros, comissões e status de operação." },
-    ],
-  }),
-  component: Casas,
-});
-
-function Casas() {
+export function CasasSection() {
   const { houses, toggleHouse } = useAdmin();
 
   return (
-    <>
+    <section id="casas" className="mt-14 scroll-mt-24 border-t border-border/60 pt-14">
       <PageHeader title="Casas parceiras" subtitle="Curadoria de cozinhas ativas na plataforma." />
       <div className="grid gap-4 md:grid-cols-2">
         {houses.map((h, i) => (
           <motion.article
             key={h.id}
             initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.5, delay: i * 0.08 }}
             whileHover={{ y: -4 }}
             className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-soft"
@@ -72,6 +62,6 @@ function Casas() {
           </motion.article>
         ))}
       </div>
-    </>
+    </section>
   );
 }

@@ -1,17 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ActionButton, Field, PageHeader, Panel } from "@/components/admin/AdminUI";
-
-export const Route = createFileRoute("/admin/configuracoes")({
-  head: () => ({
-    meta: [
-      { title: "Configurações — Painel Afya Grill" },
-      { name: "description", content: "Dados da operação, taxas de entrega e preferências." },
-    ],
-  }),
-  component: Configuracoes,
-});
 
 function Toggle({ label, hint, defaultOn }: { label: string; hint: string; defaultOn?: boolean }) {
   const [on, setOn] = useState(!!defaultOn);
@@ -35,9 +24,9 @@ function Toggle({ label, hint, defaultOn }: { label: string; hint: string; defau
   );
 }
 
-function Configuracoes() {
+export function ConfiguracoesSection() {
   return (
-    <>
+    <section id="configuracoes" className="mt-14 scroll-mt-24 border-t border-border/60 pt-14">
       <PageHeader title="Configurações" subtitle="Parâmetros gerais da operação Afya Grill." />
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel title="Dados da operação">
@@ -75,6 +64,6 @@ function Configuracoes() {
           </div>
         </Panel>
       </div>
-    </>
+    </section>
   );
 }

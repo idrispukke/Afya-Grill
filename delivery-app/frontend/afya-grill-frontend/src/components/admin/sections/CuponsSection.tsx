@@ -1,10 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   ActionButton,
+  ConfirmDialog,
   Field,
   PageHeader,
   Panel,
@@ -14,23 +14,15 @@ import {
 } from "@/components/admin/AdminUI";
 import { useAdmin } from "@/lib/admin";
 
-export const Route = createFileRoute("/admin/cupons")({
-  head: () => ({
-    meta: [
-      { title: "Cupons — Painel Afya Grill" },
-      { name: "description", content: "Crie e controle cupons de desconto da plataforma." },
-    ],
-  }),
-  component: Cupons,
-});
-
-function Cupons() {
+export function CuponsSection() {
   const { coupons, toggleCoupon, addCoupon, removeCoupon } = useAdmin();
   const [codigo, setCodigo] = useState("");
   const [valor, setValor] = useState("");
+  const [removeId, setRemoveId] = useState<string | null>(null);
+  const removeAlvo = coupons.find((c) => c.id === removeId);
 
   return (
-    <>
+    <section id="cupons" className="mt-14 scroll-mt-24 border-t border-border/60 pt-14">
       <PageHeader title="Cupons" subtitle="Campanhas promocionais ativas e pausadas." />
 
       <div className="grid gap-4 lg:grid-cols-3">
@@ -53,10 +45,8 @@ function Cupons() {
                       </ActionButton>
                       <ActionButton
                         tone="danger"
-                        onClick={() => {
-                          removeCoupon(c.id);
-                          toast.success(`Cupom ${c.codigo} excluído`);
-                        }}
+                        onClick={() => setRemoveId(c.id)}
+                        aria-label={`Excluir cupom ${c.codigo}`}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </ActionButton>
@@ -103,6 +93,22 @@ function Cupons() {
           </form>
         </Panel>
       </div>
-    </>
+
+      <ConfirmDialog
+        open={!!removeId}
+        onOpenChange={(v) => !v && setRemoveId(null)}
+        title="Excluir cupom?"
+        description={`O código ${removeAlvo?.codigo ?? ""} deixa de funcionar imediatamente para os clientes.`}
+        confirmLabel="Excluir"
+        onConfirm={() => {
+          if (removeId) {
+            const codigo = removeAlvo?.codigo;
+            removeCoupon(removeId);
+            toast.success(`Cupom ${codigo} excluído`);
+          }
+          setRemoveId(null);
+        }}
+      />
+    </section>
   );
 }

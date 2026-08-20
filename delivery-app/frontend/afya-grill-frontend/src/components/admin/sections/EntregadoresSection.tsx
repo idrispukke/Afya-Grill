@@ -1,31 +1,21 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { Bike, MapPin } from "lucide-react";
 import { ActionButton, PageHeader, Pill } from "@/components/admin/AdminUI";
 import { useAdmin } from "@/lib/admin";
 
-export const Route = createFileRoute("/admin/entregadores")({
-  head: () => ({
-    meta: [
-      { title: "Entregadores — Painel Afya Grill" },
-      { name: "description", content: "Frota de entrega, zonas atendidas e disponibilidade." },
-    ],
-  }),
-  component: Entregadores,
-});
-
-function Entregadores() {
+export function EntregadoresSection() {
   const { couriers, cycleCourier } = useAdmin();
 
   return (
-    <>
+    <section id="entregadores" className="mt-14 scroll-mt-24 border-t border-border/60 pt-14">
       <PageHeader title="Entregadores" subtitle="Frota em Duque de Caxias e região." />
       <div className="grid gap-4 md:grid-cols-2">
         {couriers.map((c, i) => (
           <motion.article
             key={c.id}
             initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.45, delay: i * 0.08 }}
             className="rounded-2xl border border-border bg-card p-6 shadow-soft"
           >
@@ -62,6 +52,6 @@ function Entregadores() {
           </motion.article>
         ))}
       </div>
-    </>
+    </section>
   );
 }

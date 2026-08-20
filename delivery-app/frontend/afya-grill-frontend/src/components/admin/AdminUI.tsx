@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { ChevronRight, Minus, TrendingDown, TrendingUp } from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -10,8 +11,25 @@ import {
   Tooltip,
   XAxis,
 } from "recharts";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+export const brlInt = (v: number) =>
+  Math.round(v).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    maximumFractionDigits: 0,
+  });
 
 export function PageHeader({
   title,
@@ -52,7 +70,8 @@ export function Panel({
   return (
     <motion.section
       initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       className={`rounded-2xl border border-border bg-card p-5 shadow-soft ${className}`}
     >
@@ -67,34 +86,135 @@ export function Panel({
   );
 }
 
+function useCountUp(target: number, start: boolean, duration = 900) {
+  const [value, setValue] = useState(0);
+  const lastTarget = useRef(0);
+
+  useEffect(() => {
+    if (!start) return;
+    const from = lastTarget.current;
+    const startTime = performance.now();
+    const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+    let raf = 0;
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - startTime) / duration);
+      setValue(from + (target - from) * ease(p));
+      if (p < 1) raf = requestAnimationFrame(tick);
+      else lastTarget.current = target;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration, start]);
+
+  return value;
+}
+
 export function StatCard({
   label,
   value,
+  format,
   delta,
   icon,
   index = 0,
 }: {
   label: string;
-  value: string;
+  value: number | string;
+  format?: (n: number) => string;
   delta?: string;
   icon?: ReactNode;
   index?: number;
 }) {
+  const [inView, setInView] = useState(false);
+  const numeric = typeof value === "number";
+  const animated = useCountUp(numeric ? value : 0, inView);
+  const display = numeric
+    ? format
+      ? format(animated)
+      : Math.round(animated).toLocaleString("pt-BR")
+    : value;
+  const trend = delta?.startsWith("+")
+    ? "up"
+    : delta?.startsWith("-")
+      ? "down"
+      : delta
+        ? "neutral"
+        : null;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 18 }}
-      animate={{ opacity: 1, y: 0 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      onViewportEnter={() => setInView(true)}
       transition={{ duration: 0.5, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -4 }}
-      className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-soft"
+      className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-soft"
     >
-      <div className="bg-glow pointer-events-none absolute -right-10 -top-14 h-32 w-32 opacity-60" />
+      <div className="bg-glow pointer-events-none absolute -right-10 -top-14 h-32 w-32 opacity-60 transition-opacity duration-300 group-hover:opacity-100" />
       <div className="flex items-center justify-between">
         <span className="text-xs uppercase tracking-widest text-muted-foreground">{label}</span>
-        {icon && <span className="text-primary">{icon}</span>}
+        {icon && (
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-secondary text-primary transition-transform duration-300 group-hover:scale-110">
+            {icon}
+          </span>
+        )}
       </div>
-      <p className="mt-3 break-words font-display text-3xl">{value}</p>
-      {delta && <p className="mt-1 text-xs text-primary">{delta}</p>}
+      <p className="mt-3 whitespace-nowrap font-display text-2xl tabular-nums">{display}</p>
+      {delta && (
+        <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+          {trend === "up" && <TrendingUp className="h-3 w-3 text-primary" />}
+          {trend === "down" && <TrendingDown className="h-3 w-3" />}
+          {trend === "neutral" && <Minus className="h-3 w-3" />}
+          <span className={trend === "up" ? "text-primary" : undefined}>{delta}</span>
+        </p>
+      )}
+      <span
+        className="absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"
+        style={{ background: "var(--gradient-ember)" }}
+      />
+    </motion.div>
+  );
+}
+
+export function LinkCard({
+  id,
+  icon,
+  title,
+  metric,
+  hint,
+  index = 0,
+}: {
+  id: string;
+  icon: ReactNode;
+  title: string;
+  metric: string;
+  hint: string;
+  index?: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <a
+        href={`#${id}`}
+        className="group flex items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary/40"
+      >
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-secondary text-primary transition-transform duration-300 group-hover:scale-110">
+          {icon}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium">{title}</p>
+          <p title={hint} className="truncate text-xs text-muted-foreground">
+            {hint}
+          </p>
+        </div>
+        <div className="shrink-0 text-right">
+          <p className="font-display text-lg tabular-nums">{metric}</p>
+        </div>
+        <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
+      </a>
     </motion.div>
   );
 }
@@ -146,10 +266,74 @@ export function Row({ children }: { children: ReactNode }) {
       initial={{ opacity: 0, x: -8 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.35 }}
-      className="[&>td]:bg-surface [&>td:first-child]:rounded-l-xl [&>td:last-child]:rounded-r-xl [&>td]:px-3 [&>td]:py-3 [&>td]:align-middle"
+      className="group [&>td]:bg-surface [&>td]:transition-colors [&>td:first-child]:rounded-l-xl [&>td:last-child]:rounded-r-xl [&>td]:px-3 [&>td]:py-3 [&>td]:align-middle group-hover:[&>td]:bg-accent/50"
     >
       {children}
     </motion.tr>
+  );
+}
+
+export function EmptyState({
+  icon,
+  title,
+  hint,
+}: {
+  icon: ReactNode;
+  title: string;
+  hint?: string;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="flex flex-col items-center justify-center gap-3 py-14 text-center"
+    >
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-muted-foreground">
+        {icon}
+      </div>
+      <div>
+        <p className="text-sm font-medium">{title}</p>
+        {hint && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
+      </div>
+    </motion.div>
+  );
+}
+
+export function ConfirmDialog({
+  open,
+  onOpenChange,
+  title,
+  description,
+  confirmLabel = "Confirmar",
+  onConfirm,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  title: string;
+  description: string;
+  confirmLabel?: string;
+  onConfirm: () => void;
+}) {
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent className="rounded-2xl border-border bg-card text-card-foreground">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="font-display text-xl">{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel className="rounded-xl border-border bg-secondary text-foreground hover:bg-accent">
+            Voltar
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={onConfirm}
+            className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {confirmLabel}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 
@@ -158,11 +342,13 @@ export function ActionButton({
   onClick,
   tone = "ghost",
   type = "button",
+  "aria-label": ariaLabel,
 }: {
   children: ReactNode;
   onClick?: () => void;
   tone?: "ghost" | "primary" | "danger";
   type?: "button" | "submit";
+  "aria-label"?: string;
 }) {
   const tones: Record<string, string> = {
     ghost: "bg-secondary hover:bg-accent text-foreground",
@@ -173,6 +359,7 @@ export function ActionButton({
     <button
       type={type}
       onClick={onClick}
+      aria-label={ariaLabel}
       className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all active:scale-95 ${tones[tone]}`}
       style={tone === "primary" ? { background: "var(--gradient-ember)" } : undefined}
     >
@@ -316,27 +503,6 @@ export function DonutChart({
           </li>
         ))}
       </ul>
-    </div>
-  );
-}
-
-export function Bars({ data }: { data: { dia: string; valor: number }[] }) {
-  const max = Math.max(...data.map((d) => d.valor));
-  return (
-    <div className="flex h-44 items-end gap-3">
-      {data.map((d, i) => (
-        <div key={d.dia} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
-          <motion.div
-            initial={{ height: 0 }}
-            animate={{ height: `${(d.valor / max) * 100}%` }}
-            transition={{ duration: 0.7, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] }}
-            className="w-full rounded-t-lg"
-            style={{ background: "var(--gradient-ember)" }}
-            title={brl(d.valor)}
-          />
-          <span className="text-[11px] text-muted-foreground">{d.dia}</span>
-        </div>
-      ))}
     </div>
   );
 }

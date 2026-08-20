@@ -1,4 +1,3 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Copy, Download, Link2, ScanLine, Smartphone, Table2 } from "lucide-react";
@@ -6,19 +5,6 @@ import { toast } from "sonner";
 import { ActionButton, PageHeader, Panel, StatCard } from "@/components/admin/AdminUI";
 import { useAdmin } from "@/lib/admin";
 import { siteOrigin, slugify } from "@/lib/utils";
-
-export const Route = createFileRoute("/admin/qrcode")({
-  head: () => ({
-    meta: [
-      { title: "Cardápio digital & QR Code — Painel Afya Grill" },
-      {
-        name: "description",
-        content: "Gere e baixe QR Codes do cardápio digital para o site e para cada mesa.",
-      },
-    ],
-  }),
-  component: QrCodePage,
-});
 
 function QrCard({
   label,
@@ -79,7 +65,7 @@ function QrCard({
   );
 }
 
-function QrCodePage() {
+export function QrCodeSection() {
   const { houses, tables } = useAdmin();
   const [casaAtiva, setCasaAtiva] = useState(houses[0]?.nome ?? "");
   const [previewUrl, setPreviewUrl] = useState<string>("/cardapio");
@@ -96,29 +82,29 @@ function QrCodePage() {
   const totalScans = tables.reduce((a, t) => a + t.scans, 0);
 
   return (
-    <>
+    <section id="qrcode" className="mt-14 scroll-mt-24 border-t border-border/60 pt-14">
       <PageHeader
         title="Cardápio digital & QR Code"
-        subtitle="Gere QR Codes para o site e para cada mesa — o cliente escaneia, vê o cardápio e pede ou reserva na hora."
+        subtitle="Gere e baixe QR Codes do cardápio digital para o site e para cada mesa."
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           index={0}
           label="Casas com cardápio ativo"
-          value={String(houses.filter((h) => h.ativo).length)}
+          value={houses.filter((h) => h.ativo).length}
           icon={<ScanLine className="h-4 w-4" />}
         />
         <StatCard
           index={1}
           label="Mesas com QR gerado"
-          value={String(tables.length)}
+          value={tables.length}
           icon={<Table2 className="h-4 w-4" />}
         />
         <StatCard
           index={2}
           label="Leituras de QR (30 dias)"
-          value={totalScans.toLocaleString("pt-BR")}
+          value={totalScans}
           delta="+22% no período"
           icon={<Smartphone className="h-4 w-4" />}
         />
@@ -223,6 +209,6 @@ function QrCodePage() {
           </div>
         </Panel>
       </div>
-    </>
+    </section>
   );
 }

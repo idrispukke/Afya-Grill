@@ -1,42 +1,63 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { Star } from "lucide-react";
+import { useState } from "react";
+import { MessageSquareOff, Star } from "lucide-react";
 import { toast } from "sonner";
-import { ActionButton, PageHeader, Pill, StatCard } from "@/components/admin/AdminUI";
+import { ActionButton, EmptyState, PageHeader, Pill, StatCard } from "@/components/admin/AdminUI";
 import { useAdmin } from "@/lib/admin";
 
-export const Route = createFileRoute("/admin/avaliacoes")({
-  head: () => ({
-    meta: [
-      { title: "Avaliações — Painel Afya Grill" },
-      { name: "description", content: "Feedback dos clientes e respostas da equipe." },
-    ],
-  }),
-  component: Avaliacoes,
-});
+const filtros = ["Todas", "Respondida", "Aguardando"] as const;
 
-function Avaliacoes() {
+export function AvaliacoesSection() {
   const { reviews, answerReview } = useAdmin();
+  const [filtro, setFiltro] = useState<(typeof filtros)[number]>("Todas");
   const media = reviews.reduce((a, r) => a + r.nota, 0) / reviews.length;
 
+  const lista = reviews.filter(
+    (r) => filtro === "Todas" || (filtro === "Respondida" ? r.respondido : !r.respondido),
+  );
+
   return (
-    <>
+    <section id="avaliacoes" className="mt-14 scroll-mt-24 border-t border-border/60 pt-14">
       <PageHeader title="Avaliações" subtitle="O que os clientes falaram das últimas entregas." />
       <div className="mb-4 grid gap-4 sm:grid-cols-2">
-        <StatCard index={0} label="Nota média" value={media.toFixed(1)} delta="meta: 4,8" />
+        <StatCard
+          index={0}
+          label="Nota média"
+          value={media}
+          format={(n) => n.toFixed(1)}
+          delta="meta: 4,8"
+        />
         <StatCard
           index={1}
           label="Pendentes de resposta"
-          value={String(reviews.filter((r) => !r.respondido).length)}
+          value={reviews.filter((r) => !r.respondido).length}
         />
       </div>
 
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        {filtros.map((f) => (
+          <button
+            key={f}
+            onClick={() => setFiltro(f)}
+            className={`rounded-full px-3.5 py-1.5 text-xs transition-all ${
+              filtro === f
+                ? "text-primary-foreground"
+                : "bg-secondary text-muted-foreground hover:text-foreground"
+            }`}
+            style={filtro === f ? { background: "var(--gradient-ember)" } : undefined}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+
       <div className="grid gap-4 md:grid-cols-2">
-        {reviews.map((r, i) => (
+        {lista.map((r, i) => (
           <motion.article
             key={r.id}
             initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.45, delay: i * 0.08 }}
             className="rounded-2xl border border-border bg-card p-6 shadow-soft"
           >
@@ -74,6 +95,13 @@ function Avaliacoes() {
           </motion.article>
         ))}
       </div>
-    </>
+      {lista.length === 0 && (
+        <EmptyState
+          icon={<MessageSquareOff className="h-5 w-5" />}
+          title="Nenhuma avaliação neste filtro"
+          hint="Tente outro filtro de status."
+        />
+      )}
+    </section>
   );
 }

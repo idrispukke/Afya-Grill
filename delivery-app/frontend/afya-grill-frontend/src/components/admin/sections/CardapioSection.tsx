@@ -1,10 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   ActionButton,
+  ConfirmDialog,
   Field,
   PageHeader,
   Panel,
@@ -15,24 +15,16 @@ import {
 } from "@/components/admin/AdminUI";
 import { useAdmin } from "@/lib/admin";
 
-export const Route = createFileRoute("/admin/cardapio")({
-  head: () => ({
-    meta: [
-      { title: "Cardápio — Painel Afya Grill" },
-      { name: "description", content: "Gerencie pratos, preços, estoque e disponibilidade." },
-    ],
-  }),
-  component: Cardapio,
-});
-
-function Cardapio() {
+export function CardapioSection() {
   const { products, toggleProduct, addProduct, removeProduct } = useAdmin();
   const [open, setOpen] = useState(false);
   const [nome, setNome] = useState("");
   const [preco, setPreco] = useState("");
+  const [removeId, setRemoveId] = useState<string | null>(null);
+  const removeAlvo = products.find((p) => p.id === removeId);
 
   return (
-    <>
+    <section id="cardapio" className="mt-14 scroll-mt-24 border-t border-border/60 pt-14">
       <PageHeader
         title="Cardápio"
         subtitle="Itens publicados nas casas parceiras."
@@ -65,10 +57,8 @@ function Cardapio() {
                     </ActionButton>
                     <ActionButton
                       tone="danger"
-                      onClick={() => {
-                        removeProduct(p.id);
-                        toast.success(`${p.nome} removido`);
-                      }}
+                      onClick={() => setRemoveId(p.id)}
+                      aria-label={`Remover ${p.nome}`}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </ActionButton>
@@ -132,6 +122,22 @@ function Cardapio() {
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+
+      <ConfirmDialog
+        open={!!removeId}
+        onOpenChange={(v) => !v && setRemoveId(null)}
+        title="Remover prato?"
+        description={`${removeAlvo?.nome ?? "Este item"} sai do cardápio e para de aparecer nas casas parceiras.`}
+        confirmLabel="Remover"
+        onConfirm={() => {
+          if (removeId) {
+            const nome = removeAlvo?.nome;
+            removeProduct(removeId);
+            toast.success(`${nome} removido`);
+          }
+          setRemoveId(null);
+        }}
+      />
+    </section>
   );
 }

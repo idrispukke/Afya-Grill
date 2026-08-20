@@ -15,19 +15,6 @@ import { Route as CardapioRouteImport } from './routes/cardapio'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as ReservasRouteImport } from './routes/reservas'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as AdminAvaliacoesRouteImport } from './routes/admin.avaliacoes'
-import { Route as AdminCardapioRouteImport } from './routes/admin.cardapio'
-import { Route as AdminCasasRouteImport } from './routes/admin.casas'
-import { Route as AdminClientesRouteImport } from './routes/admin.clientes'
-import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configuracoes'
-import { Route as AdminCuponsRouteImport } from './routes/admin.cupons'
-import { Route as AdminEntregadoresRouteImport } from './routes/admin.entregadores'
-import { Route as AdminEquipeRouteImport } from './routes/admin.equipe'
-import { Route as AdminFinanceiroRouteImport } from './routes/admin.financeiro'
-import { Route as AdminPedidosRouteImport } from './routes/admin.pedidos'
-import { Route as AdminQrcodeRouteImport } from './routes/admin.qrcode'
-import { Route as AdminRelatoriosRouteImport } from './routes/admin.relatorios'
-import { Route as AdminReservasRouteImport } from './routes/admin.reservas'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -59,71 +46,6 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminAvaliacoesRoute = AdminAvaliacoesRouteImport.update({
-  id: '/avaliacoes',
-  path: '/avaliacoes',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminCardapioRoute = AdminCardapioRouteImport.update({
-  id: '/cardapio',
-  path: '/cardapio',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminCasasRoute = AdminCasasRouteImport.update({
-  id: '/casas',
-  path: '/casas',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminClientesRoute = AdminClientesRouteImport.update({
-  id: '/clientes',
-  path: '/clientes',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
-  id: '/configuracoes',
-  path: '/configuracoes',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminCuponsRoute = AdminCuponsRouteImport.update({
-  id: '/cupons',
-  path: '/cupons',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminEntregadoresRoute = AdminEntregadoresRouteImport.update({
-  id: '/entregadores',
-  path: '/entregadores',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminEquipeRoute = AdminEquipeRouteImport.update({
-  id: '/equipe',
-  path: '/equipe',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminFinanceiroRoute = AdminFinanceiroRouteImport.update({
-  id: '/financeiro',
-  path: '/financeiro',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminPedidosRoute = AdminPedidosRouteImport.update({
-  id: '/pedidos',
-  path: '/pedidos',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminQrcodeRoute = AdminQrcodeRouteImport.update({
-  id: '/qrcode',
-  path: '/qrcode',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminRelatoriosRoute = AdminRelatoriosRouteImport.update({
-  id: '/relatorios',
-  path: '/relatorios',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminReservasRoute = AdminReservasRouteImport.update({
-  id: '/reservas',
-  path: '/reservas',
-  getParentRoute: () => AdminRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -131,19 +53,6 @@ export interface FileRoutesByFullPath {
   '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
   '/reservas': typeof ReservasRoute
-  '/admin/avaliacoes': typeof AdminAvaliacoesRoute
-  '/admin/cardapio': typeof AdminCardapioRoute
-  '/admin/casas': typeof AdminCasasRoute
-  '/admin/clientes': typeof AdminClientesRoute
-  '/admin/configuracoes': typeof AdminConfiguracoesRoute
-  '/admin/cupons': typeof AdminCuponsRoute
-  '/admin/entregadores': typeof AdminEntregadoresRoute
-  '/admin/equipe': typeof AdminEquipeRoute
-  '/admin/financeiro': typeof AdminFinanceiroRoute
-  '/admin/pedidos': typeof AdminPedidosRoute
-  '/admin/qrcode': typeof AdminQrcodeRoute
-  '/admin/relatorios': typeof AdminRelatoriosRoute
-  '/admin/reservas': typeof AdminReservasRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -151,19 +60,6 @@ export interface FileRoutesByTo {
   '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
   '/reservas': typeof ReservasRoute
-  '/admin/avaliacoes': typeof AdminAvaliacoesRoute
-  '/admin/cardapio': typeof AdminCardapioRoute
-  '/admin/casas': typeof AdminCasasRoute
-  '/admin/clientes': typeof AdminClientesRoute
-  '/admin/configuracoes': typeof AdminConfiguracoesRoute
-  '/admin/cupons': typeof AdminCuponsRoute
-  '/admin/entregadores': typeof AdminEntregadoresRoute
-  '/admin/equipe': typeof AdminEquipeRoute
-  '/admin/financeiro': typeof AdminFinanceiroRoute
-  '/admin/pedidos': typeof AdminPedidosRoute
-  '/admin/qrcode': typeof AdminQrcodeRoute
-  '/admin/relatorios': typeof AdminRelatoriosRoute
-  '/admin/reservas': typeof AdminReservasRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -173,63 +69,14 @@ export interface FileRoutesById {
   '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
   '/reservas': typeof ReservasRoute
-  '/admin/avaliacoes': typeof AdminAvaliacoesRoute
-  '/admin/cardapio': typeof AdminCardapioRoute
-  '/admin/casas': typeof AdminCasasRoute
-  '/admin/clientes': typeof AdminClientesRoute
-  '/admin/configuracoes': typeof AdminConfiguracoesRoute
-  '/admin/cupons': typeof AdminCuponsRoute
-  '/admin/entregadores': typeof AdminEntregadoresRoute
-  '/admin/equipe': typeof AdminEquipeRoute
-  '/admin/financeiro': typeof AdminFinanceiroRoute
-  '/admin/pedidos': typeof AdminPedidosRoute
-  '/admin/qrcode': typeof AdminQrcodeRoute
-  '/admin/relatorios': typeof AdminRelatoriosRoute
-  '/admin/reservas': typeof AdminReservasRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/admin'
-    | '/cardapio'
-    | '/carrinho'
-    | '/reservas'
-    | '/admin/avaliacoes'
-    | '/admin/cardapio'
-    | '/admin/casas'
-    | '/admin/clientes'
-    | '/admin/configuracoes'
-    | '/admin/cupons'
-    | '/admin/entregadores'
-    | '/admin/equipe'
-    | '/admin/financeiro'
-    | '/admin/pedidos'
-    | '/admin/qrcode'
-    | '/admin/relatorios'
-    | '/admin/reservas'
-    | '/admin/'
+    '/' | '/admin' | '/cardapio' | '/carrinho' | '/reservas' | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/cardapio'
-    | '/carrinho'
-    | '/reservas'
-    | '/admin/avaliacoes'
-    | '/admin/cardapio'
-    | '/admin/casas'
-    | '/admin/clientes'
-    | '/admin/configuracoes'
-    | '/admin/cupons'
-    | '/admin/entregadores'
-    | '/admin/equipe'
-    | '/admin/financeiro'
-    | '/admin/pedidos'
-    | '/admin/qrcode'
-    | '/admin/relatorios'
-    | '/admin/reservas'
-    | '/admin'
+  to: '/' | '/cardapio' | '/carrinho' | '/reservas' | '/admin'
   id:
     | '__root__'
     | '/'
@@ -237,19 +84,6 @@ export interface FileRouteTypes {
     | '/cardapio'
     | '/carrinho'
     | '/reservas'
-    | '/admin/avaliacoes'
-    | '/admin/cardapio'
-    | '/admin/casas'
-    | '/admin/clientes'
-    | '/admin/configuracoes'
-    | '/admin/cupons'
-    | '/admin/entregadores'
-    | '/admin/equipe'
-    | '/admin/financeiro'
-    | '/admin/pedidos'
-    | '/admin/qrcode'
-    | '/admin/relatorios'
-    | '/admin/reservas'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -305,131 +139,14 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/avaliacoes': {
-      id: '/admin/avaliacoes'
-      path: '/avaliacoes'
-      fullPath: '/admin/avaliacoes'
-      preLoaderRoute: typeof AdminAvaliacoesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/cardapio': {
-      id: '/admin/cardapio'
-      path: '/cardapio'
-      fullPath: '/admin/cardapio'
-      preLoaderRoute: typeof AdminCardapioRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/casas': {
-      id: '/admin/casas'
-      path: '/casas'
-      fullPath: '/admin/casas'
-      preLoaderRoute: typeof AdminCasasRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/clientes': {
-      id: '/admin/clientes'
-      path: '/clientes'
-      fullPath: '/admin/clientes'
-      preLoaderRoute: typeof AdminClientesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/configuracoes': {
-      id: '/admin/configuracoes'
-      path: '/configuracoes'
-      fullPath: '/admin/configuracoes'
-      preLoaderRoute: typeof AdminConfiguracoesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/cupons': {
-      id: '/admin/cupons'
-      path: '/cupons'
-      fullPath: '/admin/cupons'
-      preLoaderRoute: typeof AdminCuponsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/entregadores': {
-      id: '/admin/entregadores'
-      path: '/entregadores'
-      fullPath: '/admin/entregadores'
-      preLoaderRoute: typeof AdminEntregadoresRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/equipe': {
-      id: '/admin/equipe'
-      path: '/equipe'
-      fullPath: '/admin/equipe'
-      preLoaderRoute: typeof AdminEquipeRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/financeiro': {
-      id: '/admin/financeiro'
-      path: '/financeiro'
-      fullPath: '/admin/financeiro'
-      preLoaderRoute: typeof AdminFinanceiroRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/pedidos': {
-      id: '/admin/pedidos'
-      path: '/pedidos'
-      fullPath: '/admin/pedidos'
-      preLoaderRoute: typeof AdminPedidosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/qrcode': {
-      id: '/admin/qrcode'
-      path: '/qrcode'
-      fullPath: '/admin/qrcode'
-      preLoaderRoute: typeof AdminQrcodeRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/relatorios': {
-      id: '/admin/relatorios'
-      path: '/relatorios'
-      fullPath: '/admin/relatorios'
-      preLoaderRoute: typeof AdminRelatoriosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/reservas': {
-      id: '/admin/reservas'
-      path: '/reservas'
-      fullPath: '/admin/reservas'
-      preLoaderRoute: typeof AdminReservasRouteImport
-      parentRoute: typeof AdminRoute
-    }
   }
 }
 
 interface AdminRouteChildren {
-  AdminAvaliacoesRoute: typeof AdminAvaliacoesRoute
-  AdminCardapioRoute: typeof AdminCardapioRoute
-  AdminCasasRoute: typeof AdminCasasRoute
-  AdminClientesRoute: typeof AdminClientesRoute
-  AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
-  AdminCuponsRoute: typeof AdminCuponsRoute
-  AdminEntregadoresRoute: typeof AdminEntregadoresRoute
-  AdminEquipeRoute: typeof AdminEquipeRoute
-  AdminFinanceiroRoute: typeof AdminFinanceiroRoute
-  AdminPedidosRoute: typeof AdminPedidosRoute
-  AdminQrcodeRoute: typeof AdminQrcodeRoute
-  AdminRelatoriosRoute: typeof AdminRelatoriosRoute
-  AdminReservasRoute: typeof AdminReservasRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
-  AdminAvaliacoesRoute: AdminAvaliacoesRoute,
-  AdminCardapioRoute: AdminCardapioRoute,
-  AdminCasasRoute: AdminCasasRoute,
-  AdminClientesRoute: AdminClientesRoute,
-  AdminConfiguracoesRoute: AdminConfiguracoesRoute,
-  AdminCuponsRoute: AdminCuponsRoute,
-  AdminEntregadoresRoute: AdminEntregadoresRoute,
-  AdminEquipeRoute: AdminEquipeRoute,
-  AdminFinanceiroRoute: AdminFinanceiroRoute,
-  AdminPedidosRoute: AdminPedidosRoute,
-  AdminQrcodeRoute: AdminQrcodeRoute,
-  AdminRelatoriosRoute: AdminRelatoriosRoute,
-  AdminReservasRoute: AdminReservasRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
