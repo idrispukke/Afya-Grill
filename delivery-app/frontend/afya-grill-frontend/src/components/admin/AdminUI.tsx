@@ -5,6 +5,7 @@ import {
   Area,
   AreaChart,
   Cell,
+  LabelList,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -419,9 +420,9 @@ export function AreaTrend({
   formatter?: ((v: number) => string) | undefined;
 }) {
   return (
-    <div className="h-44 w-full">
+    <div className="h-48 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
+        <AreaChart data={data} margin={{ top: 24, right: 12, left: 12, bottom: 0 }}>
           <defs>
             <linearGradient id="areaTrendFill" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.55} />
@@ -433,6 +434,7 @@ export function AreaTrend({
             axisLine={false}
             tickLine={false}
             tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+            dy={8}
           />
           <Tooltip
             cursor={{ stroke: "var(--border)" }}
@@ -445,7 +447,19 @@ export function AreaTrend({
             strokeWidth={2.5}
             fill="url(#areaTrendFill)"
             animationDuration={900}
-          />
+            dot={{ r: 3, fill: "var(--primary)", strokeWidth: 0 }}
+            activeDot={{ r: 5, fill: "var(--gold)", strokeWidth: 2, stroke: "var(--background)" }}
+          >
+            <LabelList
+              dataKey={yKey}
+              position="top"
+              offset={10}
+              formatter={(v: number) => (formatter ? formatter(v) : String(v))}
+              fill="var(--foreground)"
+              fontSize={11}
+              fontWeight={600}
+            />
+          </Area>
         </AreaChart>
       </ResponsiveContainer>
     </div>

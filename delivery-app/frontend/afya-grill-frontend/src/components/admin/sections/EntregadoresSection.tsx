@@ -1,16 +1,40 @@
 import { motion } from "motion/react";
-import { Bike, MapPin } from "lucide-react";
-import { ActionButton, PageHeader, Pill } from "@/components/admin/AdminUI";
+import { useState } from "react";
+import { Bike, BikeIcon, MapPin } from "lucide-react";
+import { ActionButton, EmptyState, PageHeader, Pill } from "@/components/admin/AdminUI";
 import { useAdmin } from "@/lib/admin";
+
+const filtros = ["Todos", "Disponível", "Em rota", "Offline"] as const;
 
 export function EntregadoresSection() {
   const { couriers, cycleCourier } = useAdmin();
+  const [filtro, setFiltro] = useState<(typeof filtros)[number]>("Todos");
+
+  const lista = couriers.filter((c) => filtro === "Todos" || c.status === filtro);
 
   return (
     <section id="entregadores" className="mt-14 scroll-mt-24 border-t border-border/60 pt-14">
       <PageHeader title="Entregadores" subtitle="Frota em Duque de Caxias e região." />
+
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        {filtros.map((f) => (
+          <button
+            key={f}
+            onClick={() => setFiltro(f)}
+            className={`rounded-full px-3.5 py-1.5 text-xs transition-all ${
+              filtro === f
+                ? "text-primary-foreground"
+                : "bg-secondary text-muted-foreground hover:text-foreground"
+            }`}
+            style={filtro === f ? { background: "var(--gradient-ember)" } : undefined}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+
       <div className="grid gap-4 md:grid-cols-2">
-        {couriers.map((c, i) => (
+        {lista.map((c, i) => (
           <motion.article
             key={c.id}
             initial={{ opacity: 0, scale: 0.96 }}
@@ -52,6 +76,13 @@ export function EntregadoresSection() {
           </motion.article>
         ))}
       </div>
+      {lista.length === 0 && (
+        <EmptyState
+          icon={<BikeIcon className="h-5 w-5" />}
+          title="Nenhum entregador neste filtro"
+          hint="Tente outro status."
+        />
+      )}
     </section>
   );
 }

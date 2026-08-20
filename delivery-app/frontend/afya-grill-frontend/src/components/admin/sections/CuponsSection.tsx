@@ -1,10 +1,11 @@
 import { AnimatePresence } from "motion/react";
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, TicketX, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   ActionButton,
   ConfirmDialog,
+  EmptyState,
   Field,
   PageHeader,
   Panel,
@@ -14,12 +15,19 @@ import {
 } from "@/components/admin/AdminUI";
 import { useAdmin } from "@/lib/admin";
 
+const filtros = ["Todos", "Ativo", "Pausado"] as const;
+
 export function CuponsSection() {
   const { coupons, toggleCoupon, addCoupon, removeCoupon } = useAdmin();
   const [codigo, setCodigo] = useState("");
   const [valor, setValor] = useState("");
   const [removeId, setRemoveId] = useState<string | null>(null);
+  const [filtro, setFiltro] = useState<(typeof filtros)[number]>("Todos");
   const removeAlvo = coupons.find((c) => c.id === removeId);
+
+  const lista = coupons.filter(
+    (c) => filtro === "Todos" || (filtro === "Ativo" ? c.ativo : !c.ativo),
+  );
 
   return (
     <section id="cupons" className="mt-14 scroll-mt-24 border-t border-border/60 pt-14">
@@ -27,9 +35,26 @@ export function CuponsSection() {
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Panel className="lg:col-span-2">
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            {filtros.map((f) => (
+              <button
+                key={f}
+                onClick={() => setFiltro(f)}
+                className={`rounded-full px-3.5 py-1.5 text-xs transition-all ${
+                  filtro === f
+                    ? "text-primary-foreground"
+                    : "bg-secondary text-muted-foreground hover:text-foreground"
+                }`}
+                style={filtro === f ? { background: "var(--gradient-ember)" } : undefined}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+
           <TableShell head={["Código", "Tipo", "Valor", "Usos", "Status", "Ação"]}>
             <AnimatePresence initial={false}>
-              {coupons.map((c) => (
+              {lista.map((c) => (
                 <Row key={c.id}>
                   <td className="font-display text-base">{c.codigo}</td>
                   <td className="text-muted-foreground">{c.tipo}</td>
@@ -56,6 +81,13 @@ export function CuponsSection() {
               ))}
             </AnimatePresence>
           </TableShell>
+          {lista.length === 0 && (
+            <EmptyState
+              icon={<TicketX className="h-5 w-5" />}
+              title="Nenhum cupom neste filtro"
+              hint="Tente outro status."
+            />
+          )}
         </Panel>
 
         <Panel title="Criar cupom" description="Vale para todas as casas">

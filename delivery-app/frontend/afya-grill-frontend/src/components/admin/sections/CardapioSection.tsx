@@ -1,10 +1,11 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, UtensilsCrossed } from "lucide-react";
 import { toast } from "sonner";
 import {
   ActionButton,
   ConfirmDialog,
+  EmptyState,
   Field,
   PageHeader,
   Panel,
@@ -15,13 +16,23 @@ import {
 } from "@/components/admin/AdminUI";
 import { useAdmin } from "@/lib/admin";
 
+const categorias = ["Todas", "Destaques", "Principais", "Doces", "Drinks"] as const;
+
 export function CardapioSection() {
   const { products, toggleProduct, addProduct, removeProduct } = useAdmin();
   const [open, setOpen] = useState(false);
   const [nome, setNome] = useState("");
   const [preco, setPreco] = useState("");
   const [removeId, setRemoveId] = useState<string | null>(null);
+  const [categoria, setCategoria] = useState<(typeof categorias)[number]>("Todas");
+  const [busca, setBusca] = useState("");
   const removeAlvo = products.find((p) => p.id === removeId);
+
+  const lista = products.filter(
+    (p) =>
+      (categoria === "Todas" || p.categoria === categoria) &&
+      (p.nome + p.casa).toLowerCase().includes(busca.toLowerCase()),
+  );
 
   return (
     <section id="cardapio" className="mt-14 scroll-mt-24 border-t border-border/60 pt-14">
@@ -36,9 +47,32 @@ export function CardapioSection() {
       />
 
       <Panel>
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          {categorias.map((c) => (
+            <button
+              key={c}
+              onClick={() => setCategoria(c)}
+              className={`rounded-full px-3.5 py-1.5 text-xs transition-all ${
+                categoria === c
+                  ? "text-primary-foreground"
+                  : "bg-secondary text-muted-foreground hover:text-foreground"
+              }`}
+              style={categoria === c ? { background: "var(--gradient-ember)" } : undefined}
+            >
+              {c}
+            </button>
+          ))}
+          <input
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            placeholder="Buscar prato ou casa"
+            className="ml-auto w-full rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary sm:w-64"
+          />
+        </div>
+
         <TableShell head={["Prato", "Casa", "Categoria", "Preço", "Estoque", "Status", "Ação"]}>
           <AnimatePresence initial={false}>
-            {products.map((p) => (
+            {lista.map((p) => (
               <Row key={p.id}>
                 <td className="font-medium">{p.nome}</td>
                 <td className="text-muted-foreground">{p.casa}</td>
@@ -68,6 +102,13 @@ export function CardapioSection() {
             ))}
           </AnimatePresence>
         </TableShell>
+        {lista.length === 0 && (
+          <EmptyState
+            icon={<UtensilsCrossed className="h-5 w-5" />}
+            title="Nenhum prato neste filtro"
+            hint="Ajuste a categoria ou tente outra busca."
+          />
+        )}
       </Panel>
 
       <AnimatePresence>

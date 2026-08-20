@@ -1,17 +1,52 @@
 import { motion } from "motion/react";
-import { Star } from "lucide-react";
+import { useState } from "react";
+import { Star, StoreIcon } from "lucide-react";
 import { toast } from "sonner";
-import { ActionButton, PageHeader, Pill } from "@/components/admin/AdminUI";
+import { ActionButton, EmptyState, PageHeader, Pill } from "@/components/admin/AdminUI";
 import { useAdmin } from "@/lib/admin";
+
+const filtros = ["Todas", "Abertas", "Pausadas"] as const;
 
 export function CasasSection() {
   const { houses, toggleHouse } = useAdmin();
+  const [filtro, setFiltro] = useState<(typeof filtros)[number]>("Todas");
+  const [busca, setBusca] = useState("");
+
+  const lista = houses.filter(
+    (h) =>
+      (filtro === "Todas" || (filtro === "Abertas" ? h.ativo : !h.ativo)) &&
+      (h.nome + h.cozinha + h.bairro).toLowerCase().includes(busca.toLowerCase()),
+  );
 
   return (
     <section id="casas" className="mt-14 scroll-mt-24 border-t border-border/60 pt-14">
       <PageHeader title="Casas parceiras" subtitle="Curadoria de cozinhas ativas na plataforma." />
+
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        {filtros.map((f) => (
+          <button
+            key={f}
+            onClick={() => setFiltro(f)}
+            className={`rounded-full px-3.5 py-1.5 text-xs transition-all ${
+              filtro === f
+                ? "text-primary-foreground"
+                : "bg-secondary text-muted-foreground hover:text-foreground"
+            }`}
+            style={filtro === f ? { background: "var(--gradient-ember)" } : undefined}
+          >
+            {f}
+          </button>
+        ))}
+        <input
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          placeholder="Buscar por nome, cozinha ou bairro"
+          className="ml-auto w-full rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary sm:w-64"
+        />
+      </div>
+
       <div className="grid gap-4 md:grid-cols-2">
-        {houses.map((h, i) => (
+        {lista.map((h, i) => (
           <motion.article
             key={h.id}
             initial={{ opacity: 0, y: 18 }}
@@ -62,6 +97,13 @@ export function CasasSection() {
           </motion.article>
         ))}
       </div>
+      {lista.length === 0 && (
+        <EmptyState
+          icon={<StoreIcon className="h-5 w-5" />}
+          title="Nenhuma casa neste filtro"
+          hint="Ajuste os filtros ou tente outra busca."
+        />
+      )}
     </section>
   );
 }

@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Bike,
   CalendarCheck2,
   DollarSign,
+  QrCode,
   ReceiptText,
   Star,
+  TicketPercent,
+  UsersRound,
   UtensilsCrossed,
-  QrCode,
   Store,
   Users,
-  TicketPercent,
   Wallet,
   UserCog,
 } from "lucide-react";
@@ -59,20 +60,32 @@ export function OverviewSection() {
     tables,
   } = useAdmin();
   const [periodo, setPeriodo] = useState<(typeof periodos)[number]>("Hoje");
+  const [casaFiltro, setCasaFiltro] = useState<string>("Todas");
   const fator = fatorPeriodo[periodo];
   const pedidosPeriodo = Math.round(orders.length * fator);
   const faturamento = orders.reduce((a, o) => a + o.total, 0) * fator;
   const nota = reviews.reduce((a, r) => a + r.nota, 0) / reviews.length;
   const aRepassar = payouts.filter((p) => p.status === "Pendente").reduce((a, p) => a + p.bruto, 0);
-  const reservasHoje = reservations
-    .filter((r) => r.data === TODAY)
-    .sort((a, b) => (a.hora < b.hora ? -1 : 1));
+
+  const casas = useMemo(() => ["Todas", ...houses.map((h) => h.nome)], [houses]);
+
+  const pedidosFiltrados = useMemo(
+    () => orders.filter((o) => casaFiltro === "Todas" || o.casa === casaFiltro),
+    [orders, casaFiltro],
+  );
+  const reservasHoje = useMemo(
+    () =>
+      reservations
+        .filter((r) => r.data === TODAY && (casaFiltro === "Todas" || r.casa === casaFiltro))
+        .sort((a, b) => (a.hora < b.hora ? -1 : 1)),
+    [reservations, casaFiltro],
+  );
 
   return (
     <section id="dashboard" className="scroll-mt-24">
       <PageHeader title="Dashboard" subtitle="Toda a operação da Afya Grill num só lugar." />
 
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4 flex flex-wrap items-center gap-2">
         {periodos.map((p) => (
           <button
             key={p}
@@ -87,6 +100,17 @@ export function OverviewSection() {
             {p}
           </button>
         ))}
+        <select
+          value={casaFiltro}
+          onChange={(e) => setCasaFiltro(e.target.value)}
+          className="ml-auto rounded-full border border-input bg-secondary px-4 py-1.5 text-xs text-foreground outline-none transition-all focus:border-primary"
+        >
+          {casas.map((c) => (
+            <option key={c} value={c}>
+              {c === "Todas" ? "Todas as casas" : c}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
@@ -126,6 +150,43 @@ export function OverviewSection() {
           format={(n) => n.toFixed(1)}
           delta={`${reviews.length} avaliações`}
           icon={<Star className="h-4 w-4" />}
+        />
+      </div>
+
+      <div className="mb-4 mt-8">
+        <h2 className="font-display text-xl tracking-tight">Resumo geral</h2>
+        <p className="text-sm text-muted-foreground">
+          Um número de cada área — para o detalhe, role até a seção.
+        </p>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard
+          index={0}
+          label="Cardápio ativo"
+          value={products.filter((p) => p.ativo).length}
+          delta={`de ${products.length} pratos`}
+          icon={<UtensilsCrossed className="h-4 w-4" />}
+        />
+        <StatCard
+          index={1}
+          label="Cupons ativos"
+          value={coupons.filter((c) => c.ativo).length}
+          delta={`${coupons.reduce((a, c) => a + c.usos, 0)} usos no total`}
+          icon={<TicketPercent className="h-4 w-4" />}
+        />
+        <StatCard
+          index={2}
+          label="Clientes VIP"
+          value={customers.filter((c) => c.vip).length}
+          delta={`de ${customers.length} clientes`}
+          icon={<UsersRound className="h-4 w-4" />}
+        />
+        <StatCard
+          index={3}
+          label="Mesas com QR gerado"
+          value={tables.length}
+          delta={`${tables.reduce((a, t) => a + t.scans, 0)} leituras`}
+          icon={<QrCode className="h-4 w-4" />}
         />
       </div>
 
@@ -212,9 +273,12 @@ export function OverviewSection() {
       </div>
 
       <div className="mt-4">
-        <Panel title="Pedidos recentes" description="Atualizado agora">
+        <Panel
+          title="Pedidos recentes"
+          description={casaFiltro === "Todas" ? "Atualizado agora" : `Filtrado por ${casaFiltro}`}
+        >
           <TableShell head={["Pedido", "Cliente", "Casa", "Total", "Status"]}>
-            {orders.map((o) => (
+            {pedidosFiltrados.map((o) => (
               <Row key={o.id}>
                 <td className="font-medium">{o.id}</td>
                 <td>{o.cliente}</td>
@@ -232,6 +296,11 @@ export function OverviewSection() {
               </Row>
             ))}
           </TableShell>
+          {pedidosFiltrados.length === 0 && (
+            <p className="py-8 text-center text-sm text-muted-foreground">
+              Nenhum pedido para {casaFiltro}.
+            </p>
+          )}
         </Panel>
       </div>
 
