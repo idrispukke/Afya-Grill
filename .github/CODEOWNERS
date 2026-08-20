@@ -3,10 +3,10 @@
 # ==========================================
 
 # Backend / API Python
-/delivery-app/backend/ @Wendelljeronimo @Kaua-Alves
+/delivery-app/backend/ @Wendelljeronimo @Kaua-Alves @npwtech @joaodorast
 
 # Frontend / React + Tailwind
-/delivery-app/frontend/ @joaodorast @ibsonvital
+/delivery-app/frontend/ @joaodorast @ibsonvital @npwtech
 
 # Banco de dados
 /delivery-app/database/ @jmrzd @idrispukke
