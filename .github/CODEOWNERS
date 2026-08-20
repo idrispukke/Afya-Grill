@@ -3,19 +3,19 @@
 # ==========================================
 
 # Backend / API Python
-delivery-app/backend/ @Wendelljeronimo @Kaua-Alves
+/delivery-app/backend/ @Wendelljeronimo @Kaua-Alves
 
 # Frontend / React + Tailwind
-delivery-app/frontend/ @joaodorast @ibsonvital
+/delivery-app/frontend/ @joaodorast @ibsonvital
 
 # Banco de dados
-delivery-app/database/ @jmrzd @idrispukke
+/delivery-app/database/ @jmrzd @idrispukke
 
 # Testes e qualidade
-delivery-app/tests/ @Emily
+/delivery-app/tests/ @Emily
 
 # Documentação
-delivery-app/docs/ @Emily @SirMaath
+/delivery-app/docs/ @Emily @SirMaath
 
 # Configurações do GitHub e CI/CD
-delivery-app/.github/ @idrispukke @jmrzd
+.github/ @idrispukke @jmrzd
