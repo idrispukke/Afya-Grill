@@ -12,7 +12,7 @@
 /delivery-app/database/ @jmrzd @idrispukke
 
 # Testes e qualidade
-/delivery-app/tests/ @Emily
+/delivery-app/tests/ @Emily @SirMaath
 
 # Documentação
 /delivery-app/docs/ @Emily @SirMaath
