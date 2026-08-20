@@ -15,7 +15,7 @@
 /delivery-app/tests/ @SirMaath
 
 # Documentação
-/delivery-app/docs/ @Emily @SirMaath
+/delivery-app/docs/ @SirMaath
 
 # Configurações do GitHub e CI/CD
 .github/ @idrispukke @jmrzd
