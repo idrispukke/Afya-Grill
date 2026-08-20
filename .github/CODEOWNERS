@@ -1,0 +1,21 @@
+# ==========================================
+# CODEOWNERS — Delivery App
+# ==========================================
+
+# Backend / API Python
+/backend/ @Wendelljeronimo @Kaua-Alves
+
+# Frontend / React + Tailwind
+/frontend/ @joaodorast @ibsonvital
+
+# Banco de dados
+/database/ @jmrzd @idrispukke
+
+# Testes e qualidade
+/tests/ @Emily
+
+# Documentação
+/docs/ @Emily @SirMaath
+
+# Configurações do GitHub e CI/CD
+/.github/ @idrispukke @jmrzd
