@@ -11,8 +11,8 @@
 # Banco de dados
 /delivery-app/database/ @jmrzd @idrispukke
 
-# Testes e qualidade
-/delivery-app/tests/ @Emily @SirMaath
+# Testes e qualidade (adicionar emily quando ela criar conta github)
+/delivery-app/tests/ @SirMaath
 
 # Documentação
 /delivery-app/docs/ @Emily @SirMaath
