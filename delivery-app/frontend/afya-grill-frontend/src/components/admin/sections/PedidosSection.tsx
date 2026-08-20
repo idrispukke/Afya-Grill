@@ -1,8 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { Inbox } from "lucide-react";
 import { toast } from "sonner";
 import {
   ActionButton,
+  ConfirmDialog,
+  EmptyState,
   PageHeader,
   Panel,
   Pill,
@@ -13,23 +15,11 @@ import {
 import { statusFlow, type OrderStatus } from "@/data/admin";
 import { useAdmin } from "@/lib/admin";
 
-export const Route = createFileRoute("/admin/pedidos")({
-  head: () => ({
-    meta: [
-      { title: "Pedidos — Painel Afya Grill" },
-      {
-        name: "description",
-        content: "Acompanhe e atualize o status de cada pedido em andamento.",
-      },
-    ],
-  }),
-  component: Pedidos,
-});
-
-function Pedidos() {
+export function PedidosSection() {
   const { orders, setOrderStatus } = useAdmin();
   const [filtro, setFiltro] = useState<"Todos" | OrderStatus>("Todos");
   const [busca, setBusca] = useState("");
+  const [cancelId, setCancelId] = useState<string | null>(null);
 
   const lista = orders.filter(
     (o) =>
@@ -38,7 +28,7 @@ function Pedidos() {
   );
 
   return (
-    <>
+    <section id="pedidos" className="mt-14 scroll-mt-24 border-t border-border/60 pt-14">
       <PageHeader title="Pedidos" subtitle="Fila operacional com atualização de status." />
 
       <Panel>
@@ -100,13 +90,7 @@ function Pedidos() {
                   >
                     Avançar
                   </ActionButton>
-                  <ActionButton
-                    tone="danger"
-                    onClick={() => {
-                      setOrderStatus(o.id, "Cancelado");
-                      toast.error(`${o.id} cancelado`);
-                    }}
-                  >
+                  <ActionButton tone="danger" onClick={() => setCancelId(o.id)}>
                     Cancelar
                   </ActionButton>
                 </div>
@@ -115,11 +99,28 @@ function Pedidos() {
           ))}
         </TableShell>
         {lista.length === 0 && (
-          <p className="py-8 text-center text-sm text-muted-foreground">
-            Nenhum pedido neste filtro.
-          </p>
+          <EmptyState
+            icon={<Inbox className="h-5 w-5" />}
+            title="Nenhum pedido neste filtro"
+            hint="Ajuste os filtros ou tente outra busca."
+          />
         )}
       </Panel>
-    </>
+
+      <ConfirmDialog
+        open={!!cancelId}
+        onOpenChange={(v) => !v && setCancelId(null)}
+        title="Cancelar pedido?"
+        description={`O pedido ${cancelId} será marcado como cancelado. Essa ação não pode ser desfeita.`}
+        confirmLabel="Cancelar pedido"
+        onConfirm={() => {
+          if (cancelId) {
+            setOrderStatus(cancelId, "Cancelado");
+            toast.error(`${cancelId} cancelado`);
+          }
+          setCancelId(null);
+        }}
+      />
+    </section>
   );
 }

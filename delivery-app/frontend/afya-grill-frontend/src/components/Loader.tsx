@@ -2,22 +2,31 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import logo from "@/assets/afya-grill-logo.png";
 
+const SESSION_KEY = "afya-grill:loader-shown";
+
 export function Loader() {
   const [progress, setProgress] = useState(0);
-  const [done, setDone] = useState(false);
+  const [done, setDone] = useState(() =>
+    typeof window !== "undefined" ? sessionStorage.getItem(SESSION_KEY) === "1" : false,
+  );
 
   useEffect(() => {
+    if (done) return;
     let raf = 0;
     const start = performance.now();
     const tick = (t: number) => {
       const p = Math.min(100, ((t - start) / 1700) * 100);
       setProgress(p);
       if (p < 100) raf = requestAnimationFrame(tick);
-      else setTimeout(() => setDone(true), 320);
+      else
+        setTimeout(() => {
+          sessionStorage.setItem(SESSION_KEY, "1");
+          setDone(true);
+        }, 320);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [done]);
 
   return (
     <AnimatePresence>

@@ -1,9 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { CalendarCheck2, Clock3, PartyPopper, Users } from "lucide-react";
+import { CalendarCheck2, CalendarX2, Clock3, PartyPopper, Users } from "lucide-react";
 import { toast } from "sonner";
 import {
   ActionButton,
+  ConfirmDialog,
+  EmptyState,
   PageHeader,
   Panel,
   Pill,
@@ -13,19 +14,6 @@ import {
 } from "@/components/admin/AdminUI";
 import { reservationStatusFlow, type ReservationStatus } from "@/data/admin";
 import { useAdmin } from "@/lib/admin";
-
-export const Route = createFileRoute("/admin/reservas")({
-  head: () => ({
-    meta: [
-      { title: "Reservas — Painel Afya Grill" },
-      {
-        name: "description",
-        content: "Agendamentos de mesa feitos pelo cardápio digital, QR Code e site.",
-      },
-    ],
-  }),
-  component: Reservas,
-});
 
 const tone: Record<ReservationStatus, "neutral" | "good" | "warn" | "bad"> = {
   Pendente: "warn",
@@ -41,10 +29,12 @@ function formatData(iso: string) {
   return `${d}/${m}`;
 }
 
-function Reservas() {
+export function ReservasSection() {
   const { reservations, setReservationStatus } = useAdmin();
   const [filtro, setFiltro] = useState<"Todas" | ReservationStatus>("Todas");
   const [busca, setBusca] = useState("");
+  const [cancelId, setCancelId] = useState<string | null>(null);
+  const cancelAlvo = reservations.find((r) => r.id === cancelId);
 
   const hoje = useMemo(() => reservations.filter((r) => r.data === TODAY), [reservations]);
   const pessoasHoje = hoje.reduce((a, r) => a + r.pessoas, 0);
@@ -60,7 +50,7 @@ function Reservas() {
     .sort((a, b) => (a.data + a.hora < b.data + b.hora ? -1 : 1));
 
   return (
-    <>
+    <section id="reservas" className="mt-14 scroll-mt-24 border-t border-border/60 pt-14">
       <PageHeader
         title="Reservas"
         subtitle="Agendamentos feitos pelo cardápio digital, QR Code das mesas e site."
@@ -70,28 +60,28 @@ function Reservas() {
         <StatCard
           index={0}
           label="Reservas hoje"
-          value={String(hoje.length)}
-          delta={`${TODAY.split("-").reverse().join("/")}`}
+          value={hoje.length}
+          delta={TODAY.split("-").reverse().join("/")}
           icon={<CalendarCheck2 className="h-4 w-4" />}
         />
         <StatCard
           index={1}
           label="Pessoas esperadas"
-          value={String(pessoasHoje)}
+          value={pessoasHoje}
           delta="somente hoje"
           icon={<Users className="h-4 w-4" />}
         />
         <StatCard
           index={2}
           label="Confirmadas"
-          value={String(confirmadas)}
+          value={confirmadas}
           delta={`${reservations.length} no total`}
           icon={<PartyPopper className="h-4 w-4" />}
         />
         <StatCard
           index={3}
           label="Aguardando resposta"
-          value={String(pendentes)}
+          value={pendentes}
           delta="responda em até 1h"
           icon={<Clock3 className="h-4 w-4" />}
         />
@@ -169,13 +159,7 @@ function Reservas() {
                       </ActionButton>
                     )}
                     {r.status !== "Cancelada" && r.status !== "Concluída" && (
-                      <ActionButton
-                        tone="danger"
-                        onClick={() => {
-                          setReservationStatus(r.id, "Cancelada");
-                          toast.error(`Reserva ${r.codigo} cancelada`);
-                        }}
-                      >
+                      <ActionButton tone="danger" onClick={() => setCancelId(r.id)}>
                         Cancelar
                       </ActionButton>
                     )}
@@ -185,12 +169,30 @@ function Reservas() {
             ))}
           </TableShell>
           {lista.length === 0 && (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              Nenhuma reserva neste filtro.
-            </p>
+            <EmptyState
+              icon={<CalendarX2 className="h-5 w-5" />}
+              title="Nenhuma reserva neste filtro"
+              hint="Ajuste os filtros ou tente outra busca."
+            />
           )}
         </Panel>
       </div>
-    </>
+
+      <ConfirmDialog
+        open={!!cancelId}
+        onOpenChange={(v) => !v && setCancelId(null)}
+        title="Cancelar reserva?"
+        description={`A reserva ${cancelAlvo?.codigo ?? ""} de ${cancelAlvo?.cliente ?? ""} será cancelada e a mesa liberada.`}
+        confirmLabel="Cancelar reserva"
+        onConfirm={() => {
+          if (cancelId) {
+            const codigo = cancelAlvo?.codigo;
+            setReservationStatus(cancelId, "Cancelada");
+            toast.error(`Reserva ${codigo} cancelada`);
+          }
+          setCancelId(null);
+        }}
+      />
+    </section>
   );
 }
