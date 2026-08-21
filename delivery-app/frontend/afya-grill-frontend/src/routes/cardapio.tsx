@@ -9,14 +9,15 @@ import {
   ShoppingBag,
   Sparkles,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import logo from "@/assets/afya-grill-logo.png";
+import burger from "@/assets/dish-burger.jpg"; // fallback quando o item não tem imagem_url
 import { DishCard } from "@/components/DishCard";
 import { DishModal } from "@/components/DishModal";
-import { categories, dishes, type Dish } from "@/data/menu";
-import { units } from "@/data/units";
+import { categories, type Dish } from "@/data/menu";
+import { supabase } from "@/lib/supabaseClient";
 import { useCart } from "@/lib/cart";
 import { slugify } from "@/lib/utils";
 
@@ -39,24 +40,83 @@ export const Route = createFileRoute("/cardapio")({
   component: CardapioDigital,
 });
 
+// Formato que vem do Supabase (colunas reais da tabela itens_cardapio)
+type ItemCardapioRow = {
+  id: number;
+  nome: string;
+  descricao: string | null;
+  categoria: string | null;
+  preco: number;
+  disponivel: boolean;
+  imagem_url?: string | null;
+  avaliacao?: number | null;
+  tempo_preparo_min?: number | null;
+  tempo_preparo_max?: number | null;
+  tags?: string[] | null;
+  restaurante_localidades: { localidades: { nome: string } | null } | null;
+};
+
+// Converte a linha do banco pro mesmo formato "Dish" que DishCard/DishModal já esperam
+// "house" carrega o nome da unidade (localidade) — usado para filtrar por unidade
+function mapToDish(item: ItemCardapioRow): Dish {
+  const tempoMin = item.tempo_preparo_min;
+  const tempoMax = item.tempo_preparo_max;
+  return {
+    id: String(item.id),
+    name: item.nome,
+    house: item.restaurante_localidades?.localidades?.nome ?? "Afya Grill",
+    category: (item.categoria as Dish["category"]) ?? "Hambúrgueres",
+    price: Number(item.preco),
+    rating: item.avaliacao ?? 4.7,
+    time: tempoMin && tempoMax ? `${tempoMin}–${tempoMax} min` : "10–20 min",
+    tags: item.tags ?? [],
+    image: item.imagem_url || burger,
+    description: item.descricao ?? "",
+  };
+}
+
 function CardapioDigital() {
   const { casa, mesa } = Route.useSearch();
   const { count, subtotal } = useCart();
   const [active, setActive] = useState<(typeof categories)[number]>("Todos");
   const [busca, setBusca] = useState("");
   const [selected, setSelected] = useState<Dish | null>(null);
+  const [dishes, setDishes] = useState<Dish[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // O cardápio é o mesmo em todas as unidades hoje; o "casa" na URL só
-  // identifica qual unidade aparece no cabeçalho (vindo do QR Code da mesa).
+  useEffect(() => {
+    supabase
+      .from("itens_cardapio")
+      .select("*, restaurante_localidades(localidades(nome))")
+      .eq("disponivel", true)
+      .then(({ data, error }) => {
+        if (error) {
+          toast.error("Não foi possível carregar o cardápio");
+          console.error(error);
+        } else {
+          setDishes((data as ItemCardapioRow[]).map(mapToDish));
+        }
+        setLoading(false);
+      });
+  }, []);
+
+  // O cardápio é por unidade (todas servem os mesmos itens hoje, mas o modelo é
+  // por unidade). Sem "casa" na URL, cai na primeira unidade disponível — sem
+  // isso, os mesmos pratos apareceriam repetidos uma vez por unidade.
   const casaNome = useMemo(() => {
-    if (!casa) return null;
-    return units.find((u) => slugify(u.name) === casa)?.name ?? null;
-  }, [casa]);
+    if (dishes.length === 0) return null;
+    if (casa) {
+      const match = dishes.find((d) => slugify(d.house) === casa);
+      if (match) return match.house;
+    }
+    return dishes[0]?.house ?? null;
+  }, [casa, dishes]);
 
   const list = dishes.filter(
     (d) =>
       (active === "Todos" || d.category === active) &&
-      d.name.toLowerCase().includes(busca.toLowerCase()),
+      (!casaNome || d.house === casaNome) &&
+      (d.name + d.house).toLowerCase().includes(busca.toLowerCase()),
   );
 
   return (
@@ -172,7 +232,7 @@ function CardapioDigital() {
           <input
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            placeholder="Buscar prato"
+            placeholder="Buscar prato ou casa"
             className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
         </div>
@@ -201,13 +261,24 @@ function CardapioDigital() {
           ))}
         </div>
 
-        <motion.div layout className="relative mt-8 grid gap-6 pb-4 sm:grid-cols-2 lg:grid-cols-3">
-          {list.map((d, i) => (
-            <DishCard key={d.id} dish={d} index={i} onOpen={setSelected} />
-          ))}
-        </motion.div>
+        {loading && (
+          <p className="relative py-16 text-center text-sm text-muted-foreground">
+            Carregando cardápio...
+          </p>
+        )}
 
-        {list.length === 0 && (
+        {!loading && (
+          <motion.div
+            layout
+            className="relative mt-8 grid gap-6 pb-4 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {list.map((d, i) => (
+              <DishCard key={d.id} dish={d} index={i} onOpen={setSelected} />
+            ))}
+          </motion.div>
+        )}
+
+        {!loading && list.length === 0 && (
           <p className="relative py-16 text-center text-sm text-muted-foreground">
             Nenhum prato encontrado para essa busca.
           </p>
