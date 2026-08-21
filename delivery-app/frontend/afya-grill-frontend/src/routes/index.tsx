@@ -416,7 +416,7 @@ function Home() {
                 </span>
                 <div className="rounded-2xl bg-white p-3">
                   <QRCodeSVG
-                    value="https://afyagrill.com.br/cardapio?casa=afya-grill-duque-de-caxias&mesa=12"
+                    value="https://afyagrill.com.br/cardapio?casa=duque-de-caxias&mesa=12"
                     size={168}
                     level="M"
                     fgColor="#1a1108"

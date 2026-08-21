@@ -49,21 +49,27 @@ type ItemCardapioRow = {
   preco: number;
   disponivel: boolean;
   imagem_url?: string | null;
-  restaurante_localidades: { restaurantes: { nome: string } | null } | null;
+  avaliacao?: number | null;
+  tempo_preparo_min?: number | null;
+  tempo_preparo_max?: number | null;
+  tags?: string[] | null;
+  restaurante_localidades: { localidades: { nome: string } | null } | null;
 };
 
 // Converte a linha do banco pro mesmo formato "Dish" que DishCard/DishModal já esperam
+// "house" carrega o nome da unidade (localidade) — usado para filtrar por unidade
 function mapToDish(item: ItemCardapioRow): Dish {
+  const tempoMin = item.tempo_preparo_min;
+  const tempoMax = item.tempo_preparo_max;
   return {
     id: String(item.id),
     name: item.nome,
-    house: item.restaurante_localidades?.restaurantes?.nome ?? "Afya Grill",
-    category: (item.categoria as Dish["category"]) ?? "Principais",
+    house: item.restaurante_localidades?.localidades?.nome ?? "Afya Grill",
+    category: (item.categoria as Dish["category"]) ?? "Hambúrgueres",
     price: Number(item.preco),
-    // TODO: colunas ainda não existem no banco — usando valor fixo por enquanto
-    rating: 4.8,
-    time: "20–30 min",
-    tags: [],
+    rating: item.avaliacao ?? 4.7,
+    time: tempoMin && tempoMax ? `${tempoMin}–${tempoMax} min` : "10–20 min",
+    tags: item.tags ?? [],
     image: item.imagem_url || burger,
     description: item.descricao ?? "",
   };
@@ -81,7 +87,7 @@ function CardapioDigital() {
   useEffect(() => {
     supabase
       .from("itens_cardapio")
-      .select("*, restaurante_localidades(restaurantes(nome))")
+      .select("*, restaurante_localidades(localidades(nome))")
       .eq("disponivel", true)
       .then(({ data, error }) => {
         if (error) {
@@ -94,10 +100,16 @@ function CardapioDigital() {
       });
   }, []);
 
+  // O cardápio é por unidade (todas servem os mesmos itens hoje, mas o modelo é
+  // por unidade). Sem "casa" na URL, cai na primeira unidade disponível — sem
+  // isso, os mesmos pratos apareceriam repetidos uma vez por unidade.
   const casaNome = useMemo(() => {
-    if (!casa) return null;
-    const match = dishes.find((d) => slugify(d.house) === casa);
-    return match?.house ?? casa;
+    if (dishes.length === 0) return null;
+    if (casa) {
+      const match = dishes.find((d) => slugify(d.house) === casa);
+      if (match) return match.house;
+    }
+    return dishes[0]?.house ?? null;
   }, [casa, dishes]);
 
   const list = dishes.filter(
