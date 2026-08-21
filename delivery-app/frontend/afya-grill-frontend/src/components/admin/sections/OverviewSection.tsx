@@ -270,8 +270,8 @@ export function OverviewSection() {
           index={3}
           id="casas"
           icon={<Store className="h-4.5 w-4.5" />}
-          title="Casas parceiras"
-          hint="casas abertas agora"
+          title="Unidades"
+          hint="unidades abertas agora"
           metric={`${houses.filter((h) => h.ativo).length}/${houses.length}`}
         />
         <LinkCard

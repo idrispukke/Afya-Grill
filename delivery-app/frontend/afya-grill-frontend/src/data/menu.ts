@@ -44,11 +44,11 @@ export type Dish = {
 };
 
 export const dishes: Dish[] = [
-  // Brasa & Cia — Steakhouse
+  // Afya Grill Duque de Caxias — Grill
   {
     id: "smash-ouro",
     name: "Smash Ouro",
-    house: "Brasa & Cia",
+    house: "Afya Grill Duque de Caxias",
     category: "Destaques",
     price: 48.9,
     rating: 4.9,
@@ -61,7 +61,7 @@ export const dishes: Dish[] = [
   {
     id: "duplo-cheddar-brasa",
     name: "Duplo Cheddar Brasa",
-    house: "Brasa & Cia",
+    house: "Afya Grill Duque de Caxias",
     category: "Principais",
     price: 52.9,
     rating: 4.8,
@@ -74,7 +74,7 @@ export const dishes: Dish[] = [
   {
     id: "costela-fogo-de-chao",
     name: "Costela 12h no Fogo de Chão",
-    house: "Brasa & Cia",
+    house: "Afya Grill Duque de Caxias",
     category: "Principais",
     price: 68.0,
     rating: 4.9,
@@ -87,7 +87,7 @@ export const dishes: Dish[] = [
   {
     id: "picanha-na-brasa",
     name: "Picanha na Brasa",
-    house: "Brasa & Cia",
+    house: "Afya Grill Duque de Caxias",
     category: "Destaques",
     price: 89.0,
     rating: 5.0,
@@ -100,7 +100,7 @@ export const dishes: Dish[] = [
   {
     id: "old-fashioned-brasa",
     name: "Old Fashioned da Brasa",
-    house: "Brasa & Cia",
+    house: "Afya Grill Duque de Caxias",
     category: "Drinks",
     price: 38.0,
     rating: 4.7,
@@ -111,11 +111,11 @@ export const dishes: Dish[] = [
       "Bourbon envelhecido, angostura artesanal e casca de laranja queimada na chama, servido sobre gelo em cubo único.",
   },
 
-  // Osteria Lunare — Italiana
+  // Afya Grill Copacabana — Italiana
   {
     id: "tagliatelle-trufa",
     name: "Tagliatelle Trufado",
-    house: "Osteria Lunare",
+    house: "Afya Grill Copacabana",
     category: "Principais",
     price: 72.0,
     rating: 4.8,
@@ -128,7 +128,7 @@ export const dishes: Dish[] = [
   {
     id: "risoto-funghi",
     name: "Risoto ai Funghi",
-    house: "Osteria Lunare",
+    house: "Afya Grill Copacabana",
     category: "Principais",
     price: 64.0,
     rating: 4.8,
@@ -141,7 +141,7 @@ export const dishes: Dish[] = [
   {
     id: "burrata-affumicata",
     name: "Burrata Affumicata",
-    house: "Osteria Lunare",
+    house: "Afya Grill Copacabana",
     category: "Destaques",
     price: 46.0,
     rating: 4.7,
@@ -154,7 +154,7 @@ export const dishes: Dish[] = [
   {
     id: "tiramisu-della-nonna",
     name: "Tiramisù della Nonna",
-    house: "Osteria Lunare",
+    house: "Afya Grill Copacabana",
     category: "Doces",
     price: 32.0,
     rating: 4.9,
@@ -167,7 +167,7 @@ export const dishes: Dish[] = [
   {
     id: "negroni-lunare",
     name: "Negroni Lunare",
-    house: "Osteria Lunare",
+    house: "Afya Grill Copacabana",
     category: "Drinks",
     price: 40.0,
     rating: 4.8,
@@ -178,11 +178,11 @@ export const dishes: Dish[] = [
       "Gin italiano, Campari e vermute rosso em partes iguais, mexidos lentamente com gelo e finalizados com casca de laranja.",
   },
 
-  // Kaze Sushi Bar — Japonesa
+  // Afya Grill Botafogo — Japonesa
   {
     id: "omakase-15",
     name: "Omakase 15 peças",
-    house: "Kaze Sushi Bar",
+    house: "Afya Grill Botafogo",
     category: "Destaques",
     price: 139.0,
     rating: 5.0,
@@ -195,7 +195,7 @@ export const dishes: Dish[] = [
   {
     id: "combinado-kaze-20",
     name: "Combinado Kaze 20 peças",
-    house: "Kaze Sushi Bar",
+    house: "Afya Grill Botafogo",
     category: "Principais",
     price: 98.0,
     rating: 4.9,
@@ -208,7 +208,7 @@ export const dishes: Dish[] = [
   {
     id: "uramaki-salmao-crocante",
     name: "Uramaki Salmão Crocante",
-    house: "Kaze Sushi Bar",
+    house: "Afya Grill Botafogo",
     category: "Principais",
     price: 54.0,
     rating: 4.7,
@@ -221,7 +221,7 @@ export const dishes: Dish[] = [
   {
     id: "temaki-atum-picante",
     name: "Temaki Atum Picante",
-    house: "Kaze Sushi Bar",
+    house: "Afya Grill Botafogo",
     category: "Destaques",
     price: 38.0,
     rating: 4.8,
@@ -234,7 +234,7 @@ export const dishes: Dish[] = [
   {
     id: "sake-junmai-gelado",
     name: "Saquê Junmai Gelado",
-    house: "Kaze Sushi Bar",
+    house: "Afya Grill Botafogo",
     category: "Drinks",
     price: 46.0,
     rating: 4.6,
@@ -244,11 +244,11 @@ export const dishes: Dish[] = [
     description: "Saquê junmai importado, servido gelado a 8°C, com notas florais e final limpo.",
   },
 
-  // Forno Sette — Pizzaria
+  // Afya Grill Ipanema — Pizzaria
   {
     id: "margherita-lenha",
     name: "Margherita de Lenha",
-    house: "Forno Sette",
+    house: "Afya Grill Ipanema",
     category: "Principais",
     price: 59.5,
     rating: 4.7,
@@ -261,7 +261,7 @@ export const dishes: Dish[] = [
   {
     id: "quattro-formaggi",
     name: "Quattro Formaggi",
-    house: "Forno Sette",
+    house: "Afya Grill Ipanema",
     category: "Principais",
     price: 64.9,
     rating: 4.7,
@@ -274,7 +274,7 @@ export const dishes: Dish[] = [
   {
     id: "calabresa-artesanal",
     name: "Calabresa Artesanal",
-    house: "Forno Sette",
+    house: "Afya Grill Ipanema",
     category: "Principais",
     price: 57.0,
     rating: 4.6,
@@ -287,7 +287,7 @@ export const dishes: Dish[] = [
   {
     id: "panna-cotta-baunilha",
     name: "Panna Cotta de Baunilha",
-    house: "Forno Sette",
+    house: "Afya Grill Ipanema",
     category: "Doces",
     price: 28.0,
     rating: 4.8,
@@ -300,7 +300,7 @@ export const dishes: Dish[] = [
   {
     id: "spritz-sette",
     name: "Spritz Sette",
-    house: "Forno Sette",
+    house: "Afya Grill Ipanema",
     category: "Drinks",
     price: 36.0,
     rating: 4.7,
@@ -311,11 +311,11 @@ export const dishes: Dish[] = [
       "Aperol, prosecco gelado e um toque de água com gás, finalizado com rodela de laranja fresca.",
   },
 
-  // Doce Atelier — Confeitaria
+  // Afya Grill Leblon — Confeitaria
   {
     id: "lava-gold",
     name: "Lava Gold",
-    house: "Doce Atelier",
+    house: "Afya Grill Leblon",
     category: "Doces",
     price: 34.0,
     rating: 4.9,
@@ -328,7 +328,7 @@ export const dishes: Dish[] = [
   {
     id: "cheesecake-frutas-vermelhas",
     name: "Cheesecake de Frutas Vermelhas",
-    house: "Doce Atelier",
+    house: "Afya Grill Leblon",
     category: "Doces",
     price: 30.0,
     rating: 4.8,
@@ -341,7 +341,7 @@ export const dishes: Dish[] = [
   {
     id: "brownie-com-sorvete",
     name: "Brownie com Sorvete",
-    house: "Doce Atelier",
+    house: "Afya Grill Leblon",
     category: "Doces",
     price: 26.0,
     rating: 4.9,
@@ -354,7 +354,7 @@ export const dishes: Dish[] = [
   {
     id: "macaron-trio",
     name: "Macaron Trio",
-    house: "Doce Atelier",
+    house: "Afya Grill Leblon",
     category: "Doces",
     price: 22.0,
     rating: 4.7,
@@ -366,7 +366,7 @@ export const dishes: Dish[] = [
   {
     id: "cafe-gelado-afogado",
     name: "Café Gelado Afogado",
-    house: "Doce Atelier",
+    house: "Afya Grill Leblon",
     category: "Drinks",
     price: 24.0,
     rating: 4.8,
@@ -377,11 +377,11 @@ export const dishes: Dish[] = [
       "Espresso duplo servido na hora sobre uma bola de sorvete de baunilha, ao estilo affogato.",
   },
 
-  // Bar Ébano — Coquetelaria
+  // Afya Grill Flamengo — Coquetelaria
   {
     id: "smoked-citrus",
     name: "Smoked Citrus",
-    house: "Bar Ébano",
+    house: "Afya Grill Flamengo",
     category: "Drinks",
     price: 42.0,
     rating: 4.8,
@@ -394,7 +394,7 @@ export const dishes: Dish[] = [
   {
     id: "mule-de-gengibre",
     name: "Mule de Gengibre",
-    house: "Bar Ébano",
+    house: "Afya Grill Flamengo",
     category: "Drinks",
     price: 36.0,
     rating: 4.7,
@@ -407,7 +407,7 @@ export const dishes: Dish[] = [
   {
     id: "negroni-classico",
     name: "Negroni Clássico",
-    house: "Bar Ébano",
+    house: "Afya Grill Flamengo",
     category: "Drinks",
     price: 38.0,
     rating: 4.8,
@@ -420,7 +420,7 @@ export const dishes: Dish[] = [
   {
     id: "ceviche-de-tilapia",
     name: "Ceviche de Tilápia",
-    house: "Bar Ébano",
+    house: "Afya Grill Flamengo",
     category: "Destaques",
     price: 44.0,
     rating: 4.7,
@@ -433,7 +433,7 @@ export const dishes: Dish[] = [
   {
     id: "espuma-de-maracuja",
     name: "Espuma de Maracujá",
-    house: "Bar Ébano",
+    house: "Afya Grill Flamengo",
     category: "Doces",
     price: 26.0,
     rating: 4.6,

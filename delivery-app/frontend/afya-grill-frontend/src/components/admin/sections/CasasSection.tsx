@@ -9,7 +9,7 @@ export function CasasSection() {
 
   return (
     <section id="casas" className="mt-14 scroll-mt-24 border-t border-border/60 pt-14">
-      <PageHeader title="Casas parceiras" subtitle="Curadoria de cozinhas ativas na plataforma." />
+      <PageHeader title="Unidades" subtitle="Unidades da Afya Grill em operação." />
       <div className="grid gap-4 md:grid-cols-2">
         {houses.map((h, i) => (
           <motion.article
