@@ -118,7 +118,7 @@ export const seedOrders: AdminOrder[] = [
   {
     id: "AFY-2041",
     cliente: "Marina Duarte",
-    casa: "Brasa & Cia",
+    casa: "Afya Grill Duque de Caxias",
     itens: "2x Smash Ouro",
     total: 97.8,
     pagamento: "Pix",
@@ -129,7 +129,7 @@ export const seedOrders: AdminOrder[] = [
   {
     id: "AFY-2042",
     cliente: "Caio Bentes",
-    casa: "Kaze Sushi Bar",
+    casa: "Afya Grill Botafogo",
     itens: "1x Omakase 15 peças",
     total: 139,
     pagamento: "Cartão",
@@ -143,7 +143,7 @@ export const seedProducts: AdminProduct[] = [
   {
     id: "smash-ouro",
     nome: "Smash Ouro",
-    casa: "Brasa & Cia",
+    casa: "Afya Grill Duque de Caxias",
     categoria: "Destaques",
     preco: 48.9,
     estoque: 24,
@@ -152,7 +152,7 @@ export const seedProducts: AdminProduct[] = [
   {
     id: "lava-gold",
     nome: "Lava Gold",
-    casa: "Doce Atelier",
+    casa: "Afya Grill Leblon",
     categoria: "Doces",
     preco: 34,
     estoque: 8,
@@ -163,7 +163,7 @@ export const seedProducts: AdminProduct[] = [
 export const seedHouses: AdminHouse[] = [
   {
     id: "brasa",
-    nome: "Brasa & Cia",
+    nome: "Afya Grill Duque de Caxias",
     bairro: "Centro, Duque de Caxias",
     cozinha: "Grill",
     nota: 4.9,
@@ -172,8 +172,8 @@ export const seedHouses: AdminHouse[] = [
   },
   {
     id: "kaze",
-    nome: "Kaze Sushi Bar",
-    bairro: "Jardim 25 de Agosto",
+    nome: "Afya Grill Botafogo",
+    bairro: "Botafogo, Rio de Janeiro",
     cozinha: "Japonesa",
     nota: 5,
     ativo: true,
@@ -230,7 +230,7 @@ export const seedReviews: AdminReview[] = [
   {
     id: "r1",
     cliente: "Marina Duarte",
-    casa: "Brasa & Cia",
+    casa: "Afya Grill Duque de Caxias",
     nota: 5,
     comentario: "Chegou quente e no ponto perfeito. O brioche é surreal.",
     respondido: true,
@@ -238,7 +238,7 @@ export const seedReviews: AdminReview[] = [
   {
     id: "r2",
     cliente: "Caio Bentes",
-    casa: "Kaze Sushi Bar",
+    casa: "Afya Grill Botafogo",
     nota: 4,
     comentario: "Omakase impecável, só demorou 10 min a mais que o previsto.",
     respondido: false,
@@ -263,10 +263,17 @@ export const seedStaff: AdminStaff[] = [
 ];
 
 export const seedPayouts: AdminPayout[] = [
-  { id: "p1", casa: "Brasa & Cia", periodo: "01–15 Ago", bruto: 18420, taxa: 12, status: "Pago" },
+  {
+    id: "p1",
+    casa: "Afya Grill Duque de Caxias",
+    periodo: "01–15 Ago",
+    bruto: 18420,
+    taxa: 12,
+    status: "Pago",
+  },
   {
     id: "p2",
-    casa: "Kaze Sushi Bar",
+    casa: "Afya Grill Botafogo",
     periodo: "01–15 Ago",
     bruto: 22150,
     taxa: 15,
@@ -281,7 +288,7 @@ export const seedReservations: AdminReservation[] = [
     cliente: "Beatriz Nogueira",
     telefone: "(21) 98123-4455",
     email: "beatriz@email.com",
-    casa: "Brasa & Cia",
+    casa: "Afya Grill Duque de Caxias",
     pessoas: 4,
     data: "2026-08-17",
     hora: "20:00",
@@ -296,7 +303,7 @@ export const seedReservations: AdminReservation[] = [
     codigo: "AFY-R483",
     cliente: "Thiago Andrade",
     telefone: "(21) 99887-2210",
-    casa: "Kaze Sushi Bar",
+    casa: "Afya Grill Botafogo",
     pessoas: 2,
     data: "2026-08-17",
     hora: "21:30",
@@ -311,7 +318,7 @@ export const seedReservations: AdminReservation[] = [
     cliente: "Luiza Fontes",
     telefone: "(21) 98221-7734",
     email: "luiza.fontes@email.com",
-    casa: "Osteria Lunare",
+    casa: "Afya Grill Copacabana",
     pessoas: 6,
     data: "2026-08-18",
     hora: "19:30",
@@ -326,7 +333,7 @@ export const seedReservations: AdminReservation[] = [
     codigo: "AFY-R485",
     cliente: "Pedro Salgado",
     telefone: "(21) 97744-1290",
-    casa: "Forno Sette",
+    casa: "Afya Grill Ipanema",
     pessoas: 3,
     data: "2026-08-19",
     hora: "20:30",
@@ -339,7 +346,7 @@ export const seedReservations: AdminReservation[] = [
     codigo: "AFY-R486",
     cliente: "Marina Duarte",
     telefone: "(21) 98812-4410",
-    casa: "Brasa & Cia",
+    casa: "Afya Grill Duque de Caxias",
     pessoas: 2,
     data: "2026-08-16",
     hora: "20:00",
@@ -353,7 +360,7 @@ export const seedReservations: AdminReservation[] = [
     codigo: "AFY-R487",
     cliente: "Caio Bentes",
     telefone: "(21) 99604-7723",
-    casa: "Bar Ébano",
+    casa: "Afya Grill Flamengo",
     pessoas: 5,
     data: "2026-08-15",
     hora: "22:00",
@@ -364,12 +371,40 @@ export const seedReservations: AdminReservation[] = [
 ];
 
 export const seedTables: AdminTable[] = [
-  { id: "t1", casa: "Brasa & Cia", numero: 1, capacidade: 2, area: "Salão", scans: 142 },
-  { id: "t2", casa: "Brasa & Cia", numero: 2, capacidade: 4, area: "Salão", scans: 118 },
-  { id: "t3", casa: "Brasa & Cia", numero: 3, capacidade: 4, area: "Varanda", scans: 96 },
-  { id: "t4", casa: "Brasa & Cia", numero: 4, capacidade: 6, area: "Área externa", scans: 71 },
-  { id: "t5", casa: "Kaze Sushi Bar", numero: 1, capacidade: 2, area: "Bar", scans: 88 },
-  { id: "t6", casa: "Kaze Sushi Bar", numero: 2, capacidade: 4, area: "Salão", scans: 64 },
+  {
+    id: "t1",
+    casa: "Afya Grill Duque de Caxias",
+    numero: 1,
+    capacidade: 2,
+    area: "Salão",
+    scans: 142,
+  },
+  {
+    id: "t2",
+    casa: "Afya Grill Duque de Caxias",
+    numero: 2,
+    capacidade: 4,
+    area: "Salão",
+    scans: 118,
+  },
+  {
+    id: "t3",
+    casa: "Afya Grill Duque de Caxias",
+    numero: 3,
+    capacidade: 4,
+    area: "Varanda",
+    scans: 96,
+  },
+  {
+    id: "t4",
+    casa: "Afya Grill Duque de Caxias",
+    numero: 4,
+    capacidade: 6,
+    area: "Área externa",
+    scans: 71,
+  },
+  { id: "t5", casa: "Afya Grill Botafogo", numero: 1, capacidade: 2, area: "Bar", scans: 88 },
+  { id: "t6", casa: "Afya Grill Botafogo", numero: 2, capacidade: 4, area: "Salão", scans: 64 },
 ];
 
 export const revenueSeries = [

@@ -7,7 +7,7 @@ import logo from "@/assets/afya-grill-logo.png";
 
 const links = [
   { href: "/cardapio", label: "Cardápio digital" },
-  { href: "/#casas", label: "Casas" },
+  { href: "/#unidades", label: "Unidades" },
   { href: "/#como", label: "Como funciona" },
   { href: "/#contato", label: "Contato" },
 ];
