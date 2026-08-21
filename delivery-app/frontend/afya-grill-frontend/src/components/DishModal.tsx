@@ -70,7 +70,7 @@ export function DishModal({ dish, onClose }: { dish: Dish | null; onClose: () =>
               </div>
 
               <div className="p-6 sm:p-8">
-                <p className="text-xs uppercase tracking-[0.3em] text-primary">{dish.house}</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-primary">{dish.category}</p>
                 <h3 className="mt-2 text-3xl">{dish.name}</h3>
                 <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
                   <span className="inline-flex items-center gap-1">
