@@ -236,7 +236,8 @@ function CartPage() {
                     <select
                       value={form.unidade}
                       onChange={(e) => updateForm("unidade", e.target.value)}
-                      className="w-full appearance-none bg-transparent py-2.5 text-sm outline-none"
+                      style={{ colorScheme: "dark" }}
+                      className="w-full appearance-none bg-transparent py-2.5 text-sm text-foreground outline-none"
                     >
                       <option value="" disabled>
                         Escolha a unidade
