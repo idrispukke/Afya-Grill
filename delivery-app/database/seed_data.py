@@ -1,7 +1,3 @@
-/C:/Users/Rzd021/Documents/Codex/2026-08-17/server-localhost-sqlexpress-database-master-trusted.env.example
-
-
-
 from __future__ import annotations
 
 import json
@@ -13,7 +9,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parent
 
 
 def load_dotenv() -> None:

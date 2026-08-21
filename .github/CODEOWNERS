@@ -1,0 +1,21 @@
+# ==========================================
+# CODEOWNERS — Delivery App
+# ==========================================
+
+# Backend / API Python
+/delivery-app/backend/ @Wendelljeronimo @Kaua-Alves @npwtech @joaodorast
+
+# Frontend / React + Tailwind
+/delivery-app/frontend/ @joaodorast @ibsonvital @npwtech
+
+# Banco de dados
+/delivery-app/database/ @jmrzd @idrispukke
+
+# Testes e qualidade (adicionar emily quando ela criar conta github)
+/delivery-app/tests/ @SirMaath
+
+# Documentação
+/delivery-app/docs/ @SirMaath
+
+# Configurações do GitHub e CI/CD
+.github/ @idrispukke @jmrzd

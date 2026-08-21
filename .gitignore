@@ -7,6 +7,11 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Variáveis de ambiente (nunca commitar - contém chaves secretas)
+.env
+.env.*
+!.env.example
+
 node_modules
 dist
 dist-ssr
