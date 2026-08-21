@@ -31,7 +31,7 @@ const nav = [
   { id: "reservas", label: "Reservas", icon: CalendarCheck2 },
   { id: "cardapio", label: "Cardápio", icon: UtensilsCrossed },
   { id: "qrcode", label: "Cardápio digital & QR", icon: QrCode },
-  { id: "casas", label: "Casas parceiras", icon: Store },
+  { id: "casas", label: "Unidades", icon: Store },
   { id: "clientes", label: "Clientes", icon: Users },
   { id: "entregadores", label: "Entregadores", icon: Bike },
   { id: "cupons", label: "Cupons", icon: TicketPercent },
@@ -44,7 +44,7 @@ const nav = [
 const SECTION_IDS = nav.map((n) => n.id);
 
 const notifications = [
-  { id: 1, title: "Novo pedido recebido", detail: "AFY-2043 · Kaze Sushi Bar", time: "agora" },
+  { id: 1, title: "Novo pedido recebido", detail: "AFY-2043 · Afya Grill Botafogo", time: "agora" },
   {
     id: 2,
     title: "Reserva aguardando confirmação",
@@ -54,7 +54,7 @@ const notifications = [
   {
     id: 3,
     title: "Avaliação aguardando resposta",
-    detail: "Caio Bentes · Kaze Sushi Bar",
+    detail: "Caio Bentes · Afya Grill Botafogo",
     time: "3h atrás",
   },
 ];

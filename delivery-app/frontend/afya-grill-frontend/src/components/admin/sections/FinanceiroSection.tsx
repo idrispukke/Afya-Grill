@@ -32,7 +32,7 @@ export function FinanceiroSection() {
     <section id="financeiro" className="mt-14 scroll-mt-24 border-t border-border/60 pt-14">
       <PageHeader
         title="Financeiro"
-        subtitle="Receita, repasses às casas parceiras e desempenho da operação."
+        subtitle="Receita por unidade e desempenho da operação."
         action={
           <ActionButton tone="primary" onClick={() => toast.success("Relatório exportado em CSV")}>
             <Download className="h-3.5 w-3.5" /> Exportar
