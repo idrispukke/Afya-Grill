@@ -186,3 +186,20 @@ create policy "Cliente vê o histórico do próprio pedido"
 alter function public.fechar_pedido(bigint)
   security definer
   set search_path = public;
+
+-- ---------------------------------------------------------------------
+-- 8. Permissões para a service_role
+-- ---------------------------------------------------------------------
+-- Usada pelo backend/seed para operações administrativas.
+-- A service_role continua ignorando RLS, mas precisa ter os privilégios
+-- SQL necessários sobre as tabelas.
+
+grant usage on schema public to service_role;
+
+grant select, insert, update, delete
+on all tables in schema public
+to service_role;
+
+grant usage, select
+on all sequences in schema public
+to service_role;

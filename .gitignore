@@ -9,8 +9,8 @@ lerna-debug.log*
 
 # Variáveis de ambiente (nunca commitar - contém chaves secretas)
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 
 node_modules
 dist
