@@ -256,7 +256,10 @@ function CardapioDigital() {
         )}
 
         {!loading && (
-          <motion.div layout className="relative mt-8 grid gap-6 pb-4 sm:grid-cols-2 lg:grid-cols-3">
+          <motion.div
+            layout
+            className="relative mt-8 grid gap-6 pb-4 sm:grid-cols-2 lg:grid-cols-3"
+          >
             {list.map((d, i) => (
               <DishCard key={d.id} dish={d} index={i} onOpen={setSelected} />
             ))}
