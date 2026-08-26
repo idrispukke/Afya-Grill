@@ -13,8 +13,13 @@ import {
   Home,
   Store,
   AlertCircle,
+  ChevronDown,
+  Check,
+  Copy,
+  QrCode,
+  CreditCard,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Navbar } from "@/components/Navbar";
 import { useCart } from "@/lib/cart";
@@ -36,6 +41,25 @@ const emptyDeliveryForm: DeliveryForm = {
   endereco: "",
   complemento: "",
 };
+
+type MetodoPagamento = "pix" | "credito" | "debito";
+
+type CartaoForm = {
+  numero: string;
+  nome: string;
+  validade: string;
+  cvv: string;
+};
+
+const emptyCartaoForm: CartaoForm = { numero: "", nome: "", validade: "", cvv: "" };
+
+function gerarCodigoPix(total: number) {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let random = "";
+  for (let i = 0; i < 40; i++) random += chars[Math.floor(Math.random() * chars.length)];
+  const valor = total.toFixed(2);
+  return `00020126580014BR.GOV.BCB.PIX0136afyagrill-${random.slice(0, 8)}5204000053039865406${valor}5802BR5913Afya Grill6009Sao Paulo62${random.slice(8, 20)}6304${random.slice(20, 24).toUpperCase()}`;
+}
 
 export const Route = createFileRoute("/carrinho")({
   head: () => ({
@@ -64,6 +88,11 @@ function CartPage() {
   const [applied, setApplied] = useState(false);
   const [form, setForm] = useState<DeliveryForm>(emptyDeliveryForm);
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof DeliveryForm, boolean>>>({});
+  const [unidadeAberta, setUnidadeAberta] = useState(false);
+  const [pagamento, setPagamento] = useState<MetodoPagamento>("pix");
+  const [pixCode, setPixCode] = useState<string | null>(null);
+  const [cartao, setCartao] = useState<CartaoForm>(emptyCartaoForm);
+  const [cartaoErrors, setCartaoErrors] = useState<Partial<Record<keyof CartaoForm, boolean>>>({});
 
   const delivery = subtotal > 0 ? (subtotal >= 150 ? 0 : 12.9) : 0;
   const discount = applied ? subtotal * 0.1 : 0;
@@ -74,6 +103,29 @@ function CartPage() {
     setFormErrors((prev) => ({ ...prev, [key]: false }));
   }
 
+  function updateCartao<K extends keyof CartaoForm>(key: K, value: CartaoForm[K]) {
+    setCartao((prev) => ({ ...prev, [key]: value }));
+    setCartaoErrors((prev) => ({ ...prev, [key]: false }));
+  }
+
+  useEffect(() => {
+    setPixCode((prev) => prev ?? gerarCodigoPix(total));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function selecionarPagamento(metodo: MetodoPagamento) {
+    setPagamento(metodo);
+    if (metodo === "pix" && !pixCode) setPixCode(gerarCodigoPix(total));
+  }
+
+  function copiarPix() {
+    if (!pixCode) return;
+    navigator.clipboard
+      .writeText(pixCode)
+      .then(() => toast.success("Código Pix copiado"))
+      .catch(() => toast.error("Não foi possível copiar o código"));
+  }
+
   function onFinalizarPedido() {
     const errors: Partial<Record<keyof DeliveryForm, boolean>> = {
       unidade: form.unidade.trim().length === 0,
@@ -81,19 +133,41 @@ function CartPage() {
       telefone: form.telefone.trim().length < 8,
       endereco: form.endereco.trim().length === 0,
     };
-    if (Object.values(errors).some(Boolean)) {
+    const cErrors: Partial<Record<keyof CartaoForm, boolean>> =
+      pagamento === "pix"
+        ? {}
+        : {
+            numero: cartao.numero.replace(/\D/g, "").length < 16,
+            nome: cartao.nome.trim().length === 0,
+            validade: !/^\d{2}\/\d{2}$/.test(cartao.validade),
+            cvv: cartao.cvv.trim().length < 3,
+          };
+
+    if (Object.values(errors).some(Boolean) || Object.values(cErrors).some(Boolean)) {
       setFormErrors(errors);
-      toast.error("Confirma a unidade e seus dados de entrega antes de finalizar");
+      setCartaoErrors(cErrors);
+      toast.error("Confirma a unidade, seus dados e a forma de pagamento antes de finalizar");
       return;
     }
+
+    const pagamentoLabel =
+      pagamento === "pix"
+        ? "Pix"
+        : pagamento === "credito"
+          ? "Cartão de crédito"
+          : "Cartão de débito";
     toast.success("Pedido enviado para a cozinha!", {
-      description: `${form.unidade} · entrega para ${form.nome} em ${form.endereco}${form.complemento ? `, ${form.complemento}` : ""}.`,
+      description: `${form.unidade} · ${pagamentoLabel} · entrega para ${form.nome} em ${form.endereco}${form.complemento ? `, ${form.complemento}` : ""}.`,
     });
     clear();
     setForm(emptyDeliveryForm);
     setFormErrors({});
     setApplied(false);
     setCoupon("");
+    setPagamento("pix");
+    setPixCode(null);
+    setCartao(emptyCartaoForm);
+    setCartaoErrors({});
   }
 
   return (
@@ -226,30 +300,63 @@ function CartPage() {
                   Dados de entrega
                 </p>
 
-                <label className="block text-xs">
-                  <div
-                    className={`flex items-center gap-2 rounded-xl border bg-background px-3 focus-within:border-primary ${
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setUnidadeAberta((v) => !v)}
+                    className={`flex w-full items-center gap-2 rounded-xl border bg-background px-3 py-2.5 text-left text-sm outline-none focus:border-primary ${
                       formErrors.unidade ? "border-destructive" : "border-input"
                     }`}
                   >
                     <Store className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <select
-                      value={form.unidade}
-                      onChange={(e) => updateForm("unidade", e.target.value)}
-                      style={{ colorScheme: "dark" }}
-                      className="w-full appearance-none bg-transparent py-2.5 text-sm text-foreground outline-none"
-                    >
-                      <option value="" disabled>
-                        Escolha a unidade
-                      </option>
-                      {units.map((u) => (
-                        <option key={u.id} value={u.name}>
-                          {u.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </label>
+                    <span className={form.unidade ? "text-foreground" : "text-muted-foreground"}>
+                      {form.unidade || "Escolha a unidade"}
+                    </span>
+                    <ChevronDown
+                      className={`ml-auto h-4 w-4 shrink-0 text-muted-foreground transition-transform ${unidadeAberta ? "rotate-180" : ""}`}
+                    />
+                  </button>
+
+                  <AnimatePresence>
+                    {unidadeAberta && (
+                      <>
+                        <button
+                          type="button"
+                          aria-label="Fechar seleção de unidade"
+                          onClick={() => setUnidadeAberta(false)}
+                          className="fixed inset-0 z-10 cursor-default"
+                        />
+                        <motion.ul
+                          initial={{ opacity: 0, y: -8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute inset-x-0 top-full z-20 mt-2 max-h-64 overflow-auto rounded-xl border border-border bg-surface p-1.5 shadow-ember"
+                        >
+                          {units.map((u) => (
+                            <li key={u.id}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  updateForm("unidade", u.name);
+                                  setUnidadeAberta(false);
+                                }}
+                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-secondary"
+                              >
+                                {u.name === form.unidade && (
+                                  <Check className="h-3.5 w-3.5 shrink-0 text-primary" />
+                                )}
+                                <span className={u.name === form.unidade ? "" : "pl-[22px]"}>
+                                  {u.name}
+                                </span>
+                              </button>
+                            </li>
+                          ))}
+                        </motion.ul>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
 
                 <label className="block text-xs">
                   <div
@@ -321,6 +428,116 @@ function CartPage() {
                     <AlertCircle className="h-3.5 w-3.5 shrink-0" /> Escolha a unidade e preencha
                     nome, telefone e endereço para continuar
                   </p>
+                )}
+              </div>
+
+              <div className="mt-6 space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  Forma de pagamento
+                </p>
+
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => selecionarPagamento("pix")}
+                    className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-xs font-medium transition-colors ${
+                      pagamento === "pix"
+                        ? "border-primary bg-secondary text-foreground"
+                        : "border-input text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <QrCode className="h-4 w-4" /> Pix
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => selecionarPagamento("credito")}
+                    className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-xs font-medium transition-colors ${
+                      pagamento === "credito"
+                        ? "border-primary bg-secondary text-foreground"
+                        : "border-input text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <CreditCard className="h-4 w-4" /> Crédito
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => selecionarPagamento("debito")}
+                    className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-xs font-medium transition-colors ${
+                      pagamento === "debito"
+                        ? "border-primary bg-secondary text-foreground"
+                        : "border-input text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <CreditCard className="h-4 w-4" /> Débito
+                  </button>
+                </div>
+
+                {pagamento === "pix" && pixCode && (
+                  <div className="rounded-xl border border-border bg-background p-3">
+                    <p className="text-[11px] text-muted-foreground">
+                      Código Pix copia e cola (simulado)
+                    </p>
+                    <p className="mt-1.5 break-all font-mono text-[11px] leading-relaxed text-foreground">
+                      {pixCode}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={copiarPix}
+                      className="mt-2.5 inline-flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent"
+                    >
+                      <Copy className="h-3.5 w-3.5" /> Copiar código
+                    </button>
+                  </div>
+                )}
+
+                {(pagamento === "credito" || pagamento === "debito") && (
+                  <div className="space-y-2.5">
+                    <input
+                      value={cartao.numero}
+                      onChange={(e) => updateCartao("numero", e.target.value)}
+                      placeholder="Número do cartão"
+                      inputMode="numeric"
+                      autoComplete="cc-number"
+                      className={`w-full rounded-xl border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary ${
+                        cartaoErrors.numero ? "border-destructive" : "border-input"
+                      }`}
+                    />
+                    <input
+                      value={cartao.nome}
+                      onChange={(e) => updateCartao("nome", e.target.value)}
+                      placeholder="Nome impresso no cartão"
+                      autoComplete="cc-name"
+                      className={`w-full rounded-xl border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary ${
+                        cartaoErrors.nome ? "border-destructive" : "border-input"
+                      }`}
+                    />
+                    <div className="flex gap-2.5">
+                      <input
+                        value={cartao.validade}
+                        onChange={(e) => updateCartao("validade", e.target.value)}
+                        placeholder="Validade (MM/AA)"
+                        autoComplete="cc-exp"
+                        className={`w-full rounded-xl border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary ${
+                          cartaoErrors.validade ? "border-destructive" : "border-input"
+                        }`}
+                      />
+                      <input
+                        value={cartao.cvv}
+                        onChange={(e) => updateCartao("cvv", e.target.value)}
+                        placeholder="CVV"
+                        inputMode="numeric"
+                        autoComplete="cc-csc"
+                        className={`w-full rounded-xl border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary ${
+                          cartaoErrors.cvv ? "border-destructive" : "border-input"
+                        }`}
+                      />
+                    </div>
+                    {Object.values(cartaoErrors).some(Boolean) && (
+                      <p className="flex items-center gap-1.5 text-xs text-destructive">
+                        <AlertCircle className="h-3.5 w-3.5 shrink-0" /> Confira os dados do cartão
+                      </p>
+                    )}
+                  </div>
                 )}
               </div>
 

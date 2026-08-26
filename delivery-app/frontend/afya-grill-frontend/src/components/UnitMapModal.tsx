@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "motion/react";
-import { Clock, MapPin, Star, X } from "lucide-react";
+import { Clock, MapPin, Phone, Star, X } from "lucide-react";
 import { useEffect } from "react";
 import type { Unit } from "@/data/units";
 
@@ -50,13 +50,17 @@ export function UnitMapModal({ unit, onClose }: { unit: Unit | null; onClose: ()
               <X className="h-4 w-4" />
             </button>
 
-            <div className="h-64 w-full overflow-hidden sm:h-80">
+            <div className="relative h-64 w-full overflow-hidden sm:h-80">
               <iframe
                 title={`Mapa — ${unit.name}`}
                 src={embedUrl(unit)}
-                className="h-full w-full border-0"
+                className="h-full w-full border-0 grayscale-[15%] contrast-[1.05]"
                 loading="lazy"
               />
+              <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_60px_20px_rgba(0,0,0,0.35)]" />
+              <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full glass px-3 py-1.5 text-[11px] uppercase tracking-widest">
+                <MapPin className="h-3.5 w-3.5 text-primary" /> {unit.bairro}
+              </span>
             </div>
 
             <div className="p-6 sm:p-8">
@@ -76,16 +80,31 @@ export function UnitMapModal({ unit, onClose }: { unit: Unit | null; onClose: ()
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                 {unit.endereco}
               </p>
-
               <a
-                href={`https://www.openstreetmap.org/?mlat=${unit.lat}&mlon=${unit.lng}#map=17/${unit.lat}/${unit.lng}`}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-6 inline-flex w-full items-center justify-center rounded-xl py-3.5 text-sm font-semibold text-primary-foreground shadow-ember transition-transform hover:scale-[1.02] active:scale-[0.99]"
-                style={{ background: "var(--gradient-ember)" }}
+                href={`tel:+55${unit.telefone.replace(/\D/g, "")}`}
+                className="mt-2 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
-                Abrir rota no mapa
+                <Phone className="h-4 w-4 shrink-0 text-primary" />
+                {unit.telefone}
               </a>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                <a
+                  href={`https://www.openstreetmap.org/?mlat=${unit.lat}&mlon=${unit.lng}#map=17/${unit.lat}/${unit.lng}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex flex-1 items-center justify-center rounded-xl py-3.5 text-sm font-semibold text-primary-foreground shadow-ember transition-transform hover:scale-[1.02] active:scale-[0.99]"
+                  style={{ background: "var(--gradient-ember)" }}
+                >
+                  Abrir rota no mapa
+                </a>
+                <a
+                  href={`tel:+55${unit.telefone.replace(/\D/g, "")}`}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-5 py-3.5 text-sm font-semibold transition-colors hover:bg-secondary"
+                >
+                  <Phone className="h-4 w-4" /> Ligar
+                </a>
+              </div>
             </div>
           </motion.div>
         </motion.div>
