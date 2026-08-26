@@ -526,13 +526,25 @@ function Home() {
               Rio a Duque de Caxias.
             </p>
             <div className="mt-6 flex gap-3">
-              {[Instagram, Mail, Phone].map((Icon, i) => (
-                <span
-                  key={i}
+              {[
+                {
+                  Icon: Instagram,
+                  href: "https://www.instagram.com/afyagrill",
+                  label: "Instagram",
+                },
+                { Icon: Mail, href: "mailto:ola@afyagrill.com.br", label: "E-mail" },
+                { Icon: Phone, href: "tel:+552140028922", label: "Telefone" },
+              ].map(({ Icon, href, label }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target={href.startsWith("http") ? "_blank" : undefined}
+                  rel={href.startsWith("http") ? "noreferrer" : undefined}
+                  aria-label={label}
                   className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border transition-colors hover:border-primary hover:text-primary"
                 >
                   <Icon className="h-4 w-4" />
-                </span>
+                </a>
               ))}
             </div>
           </Reveal>
