@@ -277,33 +277,46 @@ function Home() {
             </h2>
           </Reveal>
 
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {units.map((u, i) => (
               <Reveal key={u.id} delay={i * 0.05}>
-                <motion.button
-                  onClick={() => setSelectedUnit(u)}
+                <motion.div
                   whileHover={{ y: -6 }}
-                  className="group relative w-full overflow-hidden rounded-2xl border border-border bg-surface p-6 text-left transition-colors hover:border-primary/60"
+                  className="group relative overflow-hidden rounded-2xl border border-border bg-surface shadow-soft transition-colors hover:border-primary/60"
                 >
                   <div className="absolute inset-x-0 -top-px h-px overflow-hidden">
                     <span className="absolute inset-y-0 w-1/3 animate-shimmer bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 group-hover:opacity-100" />
                   </div>
-                  <p className="font-display text-2xl">{u.name}</p>
-                  <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
-                    <MapPin className="h-3.5 w-3.5 text-primary" /> {u.bairro}, {u.cidade}
-                  </p>
-                  <div className="mt-5 flex items-center gap-4 text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1">
-                      <Star className="h-3 w-3 fill-gold text-gold" /> {u.rating}
+
+                  <button onClick={() => setSelectedUnit(u)} className="block w-full p-6 text-left">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-[10px] uppercase tracking-widest text-muted-foreground">
+                      {u.especialidade}
                     </span>
-                    <span className="inline-flex items-center gap-1">
-                      <Clock className="h-3 w-3" /> {u.time}
-                    </span>
-                    <span className="ml-auto text-primary underline-offset-4 group-hover:underline">
-                      Ver no mapa
-                    </span>
-                  </div>
-                </motion.button>
+                    <p className="mt-3 font-display text-2xl">{u.name}</p>
+                    <p className="mt-1.5 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" /> {u.bairro},{" "}
+                      {u.cidade}
+                    </p>
+                    <div className="mt-5 flex items-center gap-4 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1">
+                        <Star className="h-3 w-3 fill-gold text-gold" /> {u.rating}
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <Clock className="h-3 w-3" /> {u.time}
+                      </span>
+                      <span className="ml-auto text-primary underline-offset-4 group-hover:underline">
+                        Ver no mapa
+                      </span>
+                    </div>
+                  </button>
+
+                  <a
+                    href={`tel:+55${u.telefone.replace(/\D/g, "")}`}
+                    className="flex items-center gap-2 border-t border-border px-6 py-3.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                  >
+                    <Phone className="h-3.5 w-3.5 shrink-0 text-primary" /> {u.telefone}
+                  </a>
+                </motion.div>
               </Reveal>
             ))}
           </div>

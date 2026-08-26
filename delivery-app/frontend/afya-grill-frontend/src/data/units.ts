@@ -4,6 +4,7 @@ export type Unit = {
   bairro: string;
   cidade: string;
   endereco: string;
+  telefone: string;
   especialidade: string;
   rating: string;
   time: string;
@@ -18,6 +19,7 @@ export const units: Unit[] = [
     bairro: "Centro",
     cidade: "Duque de Caxias",
     endereco: "Av. Presidente Vargas, 1200 — Centro, Duque de Caxias, RJ",
+    telefone: "(21) 3555-0101",
     especialidade: "Grill",
     rating: "4.9",
     time: "25 min",
@@ -30,6 +32,7 @@ export const units: Unit[] = [
     bairro: "Copacabana",
     cidade: "Rio de Janeiro",
     endereco: "Av. Atlântica, 1702 — Copacabana, Rio de Janeiro, RJ",
+    telefone: "(21) 3555-0102",
     especialidade: "Italiana",
     rating: "4.8",
     time: "35 min",
@@ -42,6 +45,7 @@ export const units: Unit[] = [
     bairro: "Botafogo",
     cidade: "Rio de Janeiro",
     endereco: "Rua Voluntários da Pátria, 45 — Botafogo, Rio de Janeiro, RJ",
+    telefone: "(21) 3555-0103",
     especialidade: "Japonesa",
     rating: "5.0",
     time: "40 min",
@@ -54,6 +58,7 @@ export const units: Unit[] = [
     bairro: "Ipanema",
     cidade: "Rio de Janeiro",
     endereco: "Rua Visconde de Pirajá, 414 — Ipanema, Rio de Janeiro, RJ",
+    telefone: "(21) 3555-0104",
     especialidade: "Pizzaria",
     rating: "4.7",
     time: "30 min",
@@ -66,6 +71,7 @@ export const units: Unit[] = [
     bairro: "Leblon",
     cidade: "Rio de Janeiro",
     endereco: "Av. Ataulfo de Paiva, 1240 — Leblon, Rio de Janeiro, RJ",
+    telefone: "(21) 3555-0105",
     especialidade: "Confeitaria",
     rating: "4.9",
     time: "20 min",
@@ -78,6 +84,7 @@ export const units: Unit[] = [
     bairro: "Flamengo",
     cidade: "Rio de Janeiro",
     endereco: "Praia do Flamengo, 200 — Flamengo, Rio de Janeiro, RJ",
+    telefone: "(21) 3555-0106",
     especialidade: "Coquetelaria",
     rating: "4.8",
     time: "15 min",
