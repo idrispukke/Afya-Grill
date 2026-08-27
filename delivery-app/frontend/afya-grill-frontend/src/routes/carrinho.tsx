@@ -22,6 +22,7 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Navbar } from "@/components/Navbar";
+import { CrossSell } from "@/components/ai/CrossSell";
 import { useCart } from "@/lib/cart";
 import { brl } from "@/data/menu";
 import { units } from "@/data/units";
@@ -275,6 +276,8 @@ function CartPage() {
                   </motion.div>
                 ))}
               </AnimatePresence>
+
+              <CrossSell items={items} />
 
               <button
                 onClick={() => {

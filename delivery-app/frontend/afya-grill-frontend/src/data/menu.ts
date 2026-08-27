@@ -12,12 +12,33 @@ import sucoNaturalLaranja from "@/assets/burgers/suco-natural-laranja.jpg";
 import milkshakeChocolate from "@/assets/burgers/milkshake-chocolate.jpg";
 import limonada from "@/assets/burgers/limonada.jpg";
 import aguaComGas from "@/assets/burgers/agua-com-gas.jpg";
+import frangoCrocanteSupreme from "@/assets/burgers/frango-crocante-supreme.jpg";
+import petitGateau from "@/assets/burgers/petit-gateau.jpg";
+import comboDuoClassico from "@/assets/burgers/combo-duo-classico.jpg";
+import comboDuoBacon from "@/assets/burgers/combo-duo-bacon.jpg";
+import cheesecakeFrutasVermelhas from "@/assets/burgers/cheesecake-frutas-vermelhas.jpg";
+import tortaChocolateBelga from "@/assets/burgers/torta-chocolate-belga.jpg";
+import tortaMorango from "@/assets/burgers/torta-morango.jpg";
+import aguaSemGas from "@/assets/burgers/agua-sem-gas.jpg";
+import cocaColaLata from "@/assets/burgers/coca-cola-lata.jpg";
+import fantaLaranjaLata from "@/assets/burgers/fanta-laranja-lata.jpg";
+import spriteLata from "@/assets/burgers/sprite-lata.jpg";
+import milkshakeMorango from "@/assets/burgers/milkshake-morango.jpg";
+import milkshakeDoceDeLeite from "@/assets/burgers/milkshake-doce-de-leite.jpg";
 
 export type Dish = {
   id: string;
   name: string;
   house: string;
-  category: "Hambúrgueres" | "Batatas" | "Bebidas";
+  category:
+    | "Hambúrgueres"
+    | "Batatas"
+    | "Combos"
+    | "Sobremesas"
+    | "Água"
+    | "Milkshakes"
+    | "Refrigerantes"
+    | "Sucos";
   price: number;
   rating: number;
   time: string;
@@ -93,6 +114,19 @@ export const dishes: Dish[] = [
     description:
       "Blend na chapa, cheddar derretido, anéis de cebola crocante e bastante molho barbecue — o queridinho de quem gosta de sujar a mão.",
   },
+  {
+    id: "frango-crocante-supreme",
+    name: "Frango Crocante Supreme",
+    house: "Afya Grill",
+    category: "Hambúrgueres",
+    price: 33.9,
+    rating: 4.8,
+    time: "20–25 min",
+    tags: ["Frango empanado", "Maionese da casa", "Pão brioche"],
+    image: frangoCrocanteSupreme,
+    description:
+      "Peito de frango empanado e frito na hora, extra crocante, com maionese da casa e alface no brioche amanteigado.",
+  },
 
   // Batatas
   {
@@ -134,36 +168,118 @@ export const dishes: Dish[] = [
       "Palitos de batata doce fritos na hora, com aquele equilíbrio entre doce e salgado.",
   },
 
-  // Bebidas
+  // Combos — para 2 pessoas, já vêm com hambúrguer, batata, sobremesa e molho
   {
-    id: "refrigerante-lata",
-    name: "Refrigerante Lata",
+    id: "combo-duo-classico",
+    name: "Combo Duo Clássico",
     house: "Afya Grill",
-    category: "Bebidas",
-    price: 7.0,
-    rating: 4.5,
-    time: "2 min",
-    tags: ["Gelado", "350ml"],
-    image: refrigeranteLata,
-    description: "Lata de 350ml, sempre gelada, nos sabores cola, guaraná ou limão.",
+    category: "Combos",
+    price: 58.9,
+    rating: 4.9,
+    time: "25–30 min",
+    tags: ["2 pessoas", "2x Cheeseburger Clássico", "Serve bem no bolso"],
+    image: comboDuoClassico,
+    description:
+      "Para 2 pessoas: 2 Cheeseburger Clássico, 1 Batata Frita Clássica grande para dividir, 2 Petit Gâteau de sobremesa e molho barbecue da casa. O combo redondo pra matar a fome sem estourar o orçamento.",
   },
   {
-    id: "suco-natural-laranja",
-    name: "Suco Natural de Laranja",
+    id: "combo-duo-bacon",
+    name: "Combo Duo Bacon",
     house: "Afya Grill",
-    category: "Bebidas",
-    price: 9.9,
+    category: "Combos",
+    price: 74.9,
+    rating: 4.9,
+    time: "25–30 min",
+    tags: ["2 pessoas", "2x Duplo Bacon BBQ", "Serve bem pesado"],
+    image: comboDuoBacon,
+    description:
+      "Para 2 pessoas: 2 Duplo Bacon BBQ, 1 Batata Rústica Cheddar e Bacon grande para dividir, 2 Petit Gâteau de sobremesa e molho barbecue extra. Pra quem não abre mão de bacon em dobro.",
+  },
+
+  // Sobremesas
+  {
+    id: "petit-gateau",
+    name: "Petit Gâteau",
+    house: "Afya Grill",
+    category: "Sobremesas",
+    price: 19.9,
+    rating: 4.9,
+    time: "10–15 min",
+    tags: ["Casquinha crocante", "Recheio derretido", "Sorvete de creme"],
+    image: petitGateau,
+    description:
+      "Bolinho de chocolate quente com casquinha crocante e recheio derretido, servido com uma bola de sorvete de creme e frutas vermelhas.",
+  },
+  {
+    id: "cheesecake-frutas-vermelhas",
+    name: "Cheesecake de Frutas Vermelhas",
+    house: "Afya Grill",
+    category: "Sobremesas",
+    price: 21.9,
     rating: 4.8,
-    time: "5 min",
-    tags: ["Espremido na hora", "Sem açúcar adicionado"],
-    image: sucoNaturalLaranja,
-    description: "Suco de laranja espremido na hora, sem adição de açúcar.",
+    time: "10 min",
+    tags: ["Base amanteigada", "Mirtilos frescos", "Cremoso"],
+    image: cheesecakeFrutasVermelhas,
+    description: "Cheesecake cremoso com base amanteigada, coberto com mirtilos frescos.",
   },
+  {
+    id: "torta-chocolate-belga",
+    name: "Torta de Chocolate Belga",
+    house: "Afya Grill",
+    category: "Sobremesas",
+    price: 18.9,
+    rating: 4.9,
+    time: "10 min",
+    tags: ["Camadas de chocolate", "Ganache", "Intenso"],
+    image: tortaChocolateBelga,
+    description:
+      "Torta em camadas de chocolate belga com ganache cremoso, para quem não brinca em serviço.",
+  },
+  {
+    id: "torta-morango",
+    name: "Torta de Morango",
+    house: "Afya Grill",
+    category: "Sobremesas",
+    price: 17.9,
+    rating: 4.7,
+    time: "10 min",
+    tags: ["Morangos frescos", "Creme leve", "Refrescante"],
+    image: tortaMorango,
+    description: "Torta com base crocante, creme leve e morangos frescos brilhando por cima.",
+  },
+
+  // Água
+  {
+    id: "agua-com-gas",
+    name: "Água com Gás",
+    house: "Afya Grill",
+    category: "Água",
+    price: 6.5,
+    rating: 4.5,
+    time: "1 min",
+    tags: ["500ml", "Gelada"],
+    image: aguaComGas,
+    description: "Água com gás gelada, 500ml.",
+  },
+  {
+    id: "agua-sem-gas",
+    name: "Água sem Gás",
+    house: "Afya Grill",
+    category: "Água",
+    price: 5.5,
+    rating: 4.5,
+    time: "1 min",
+    tags: ["500ml", "Gelada"],
+    image: aguaSemGas,
+    description: "Água mineral sem gás, 500ml, sempre gelada.",
+  },
+
+  // Milkshakes
   {
     id: "milkshake-chocolate",
     name: "Milkshake de Chocolate",
     house: "Afya Grill",
-    category: "Bebidas",
+    category: "Milkshakes",
     price: 17.9,
     rating: 4.9,
     time: "5–10 min",
@@ -172,10 +288,98 @@ export const dishes: Dish[] = [
     description: "Milkshake cremoso de chocolate belga, coberto com chantilly e cereja.",
   },
   {
+    id: "milkshake-morango",
+    name: "Milkshake de Morango",
+    house: "Afya Grill",
+    category: "Milkshakes",
+    price: 16.9,
+    rating: 4.7,
+    time: "5–10 min",
+    tags: ["Morango natural", "Cremoso", "Hortelã"],
+    image: milkshakeMorango,
+    description: "Milkshake cremoso de morango natural, com um toque de hortelã fresca.",
+  },
+  {
+    id: "milkshake-doce-de-leite",
+    name: "Milkshake de Doce de Leite",
+    house: "Afya Grill",
+    category: "Milkshakes",
+    price: 17.9,
+    rating: 4.8,
+    time: "5–10 min",
+    tags: ["Doce de leite", "Chantilly", "Calda de caramelo"],
+    image: milkshakeDoceDeLeite,
+    description: "Milkshake cremoso de doce de leite, coberto com chantilly e calda de caramelo.",
+  },
+
+  // Refrigerantes
+  {
+    id: "refrigerante-lata",
+    name: "Refrigerante Lata",
+    house: "Afya Grill",
+    category: "Refrigerantes",
+    price: 7.0,
+    rating: 4.5,
+    time: "2 min",
+    tags: ["Gelado", "350ml"],
+    image: refrigeranteLata,
+    description: "Lata de 350ml, sempre gelada, nos sabores cola, guaraná ou limão.",
+  },
+  {
+    id: "coca-cola-lata",
+    name: "Coca-Cola Lata",
+    house: "Afya Grill",
+    category: "Refrigerantes",
+    price: 7.0,
+    rating: 4.8,
+    time: "2 min",
+    tags: ["Gelada", "350ml"],
+    image: cocaColaLata,
+    description: "Lata de Coca-Cola, 350ml, sempre gelada.",
+  },
+  {
+    id: "fanta-laranja-lata",
+    name: "Fanta Laranja Lata",
+    house: "Afya Grill",
+    category: "Refrigerantes",
+    price: 7.0,
+    rating: 4.6,
+    time: "2 min",
+    tags: ["Gelada", "350ml"],
+    image: fantaLaranjaLata,
+    description: "Lata de Fanta Laranja, 350ml, sempre gelada.",
+  },
+  {
+    id: "sprite-lata",
+    name: "Sprite Lata",
+    house: "Afya Grill",
+    category: "Refrigerantes",
+    price: 7.0,
+    rating: 4.6,
+    time: "2 min",
+    tags: ["Gelada", "350ml"],
+    image: spriteLata,
+    description: "Lata de Sprite, 350ml, sempre gelada.",
+  },
+
+  // Sucos
+  {
+    id: "suco-natural-laranja",
+    name: "Suco Natural de Laranja",
+    house: "Afya Grill",
+    category: "Sucos",
+    price: 9.9,
+    rating: 4.8,
+    time: "5 min",
+    tags: ["Espremido na hora", "Sem açúcar adicionado"],
+    image: sucoNaturalLaranja,
+    description: "Suco de laranja espremido na hora, sem adição de açúcar.",
+  },
+  {
     id: "limonada",
     name: "Limonada da Casa",
     house: "Afya Grill",
-    category: "Bebidas",
+    category: "Sucos",
     price: 11.9,
     rating: 4.7,
     time: "5 min",
@@ -183,20 +387,18 @@ export const dishes: Dish[] = [
     image: limonada,
     description: "Limonada gelada com limão siciliano e um toque de hortelã fresca.",
   },
-  {
-    id: "agua-com-gas",
-    name: "Água com Gás",
-    house: "Afya Grill",
-    category: "Bebidas",
-    price: 6.5,
-    rating: 4.5,
-    time: "1 min",
-    tags: ["500ml", "Gelada"],
-    image: aguaComGas,
-    description: "Água com gás gelada, 500ml.",
-  },
 ];
 
-export const categories = ["Todos", "Hambúrgueres", "Batatas", "Bebidas"] as const;
+export const categories = [
+  "Todos",
+  "Hambúrgueres",
+  "Batatas",
+  "Combos",
+  "Sobremesas",
+  "Água",
+  "Milkshakes",
+  "Refrigerantes",
+  "Sucos",
+] as const;
 
 export const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
