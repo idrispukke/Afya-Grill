@@ -18,7 +18,8 @@ export const units: Unit[] = [
     name: "Afya Grill Duque de Caxias",
     bairro: "Centro",
     cidade: "Duque de Caxias",
-    endereco: ": R Professor José de Souza Herdy, 1216 - Jardim Vinte e Cinco de Agosto, Duque de Caxias - RJ, 25071-202",
+    endereco:
+      ": R Professor José de Souza Herdy, 1216 - Jardim Vinte e Cinco de Agosto, Duque de Caxias - RJ, 25071-202",
     telefone: "(21) 3555-0101",
     especialidade: "Grill",
     rating: "4.9",

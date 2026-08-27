@@ -23,7 +23,6 @@ import { categories, dishes, type Dish } from "@/data/menu";
 import { units } from "@/data/units";
 import { aiSemanticSearch } from "@/lib/ai";
 import { useCart } from "@/lib/cart";
-import { slugify } from "@/lib/utils";
 
 const searchSchema = z.object({
   casa: z.string().optional(),
@@ -70,7 +69,7 @@ function CardapioDigital() {
   // identifica qual unidade aparece no cabeçalho (vindo do QR Code da mesa).
   const casaNome = useMemo(() => {
     if (!casa) return null;
-    return units.find((u) => slugify(u.name) === casa)?.name ?? null;
+    return units.find((u) => u.id === casa)?.name ?? null;
   }, [casa]);
 
   const list = aiOrder
@@ -102,6 +101,7 @@ function CardapioDigital() {
             </Link>
             <Link
               to="/carrinho"
+              search={{ casa, mesa }}
               className="relative inline-flex items-center gap-2 rounded-xl bg-secondary px-4 py-2 text-sm font-medium transition-colors hover:bg-accent"
             >
               <ShoppingBag className="h-4 w-4" />
@@ -283,6 +283,7 @@ function CardapioDigital() {
           >
             <Link
               to="/carrinho"
+              search={{ casa, mesa }}
               className="mx-auto flex max-w-5xl items-center justify-between rounded-2xl px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-ember"
               style={{ background: "var(--gradient-ember)" }}
             >

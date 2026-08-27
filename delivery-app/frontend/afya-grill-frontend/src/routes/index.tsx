@@ -26,6 +26,7 @@ import { DishModal } from "@/components/DishModal";
 import { UnitMapModal } from "@/components/UnitMapModal";
 import { categories, dishes, type Dish } from "@/data/menu";
 import { units, type Unit } from "@/data/units";
+import { siteOrigin } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -429,7 +430,7 @@ function Home() {
                 </span>
                 <div className="rounded-2xl bg-white p-3">
                   <QRCodeSVG
-                    value="https://afyagrill.com.br/cardapio?casa=duque-de-caxias&mesa=12"
+                    value={`${siteOrigin()}/cardapio?casa=duque-de-caxias&mesa=12`}
                     size={168}
                     level="M"
                     fgColor="#1a1108"

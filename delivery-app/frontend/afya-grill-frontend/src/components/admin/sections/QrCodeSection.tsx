@@ -112,7 +112,7 @@ export function QrCodeSection() {
           index={3}
           label="Link do site"
           value="/cardapio"
-          delta="afyagrill.com.br"
+          delta={origin.replace(/^https?:\/\//, "")}
           icon={<Link2 className="h-4 w-4" />}
         />
       </div>
