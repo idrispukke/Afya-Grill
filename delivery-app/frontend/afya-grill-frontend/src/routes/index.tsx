@@ -15,7 +15,7 @@ import {
   Star,
   Utensils,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import heroImg from "@/assets/hero.jpg";
 import { Loader } from "@/components/Loader";
@@ -106,6 +106,14 @@ function Home() {
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const imgY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const fade = useTransform(scrollYProgress, [0, 1], [1, 0]);
+
+  // O valor do QR Code depende de window.location.origin, que difere entre o
+  // HTML renderizado no servidor (fallback fixo) e o navegador — calcular só
+  // depois de montar evita o mismatch de hydration no SVG gerado.
+  const [qrOrigin, setQrOrigin] = useState<string | null>(null);
+  useEffect(() => {
+    setQrOrigin(siteOrigin());
+  }, []);
 
   const list = active === "Todos" ? dishes : dishes.filter((d) => d.category === active);
 
@@ -428,13 +436,15 @@ function Home() {
                 <span className="absolute -top-3 left-1/2 w-max -translate-x-1/2 whitespace-nowrap rounded-full glass px-4 py-1 text-[11px] uppercase tracking-widest">
                   Mesa 12 · Afya Grill Duque de Caxias
                 </span>
-                <div className="rounded-2xl bg-white p-3">
-                  <QRCodeSVG
-                    value={`${siteOrigin()}/cardapio?casa=duque-de-caxias&mesa=12`}
-                    size={168}
-                    level="M"
-                    fgColor="#1a1108"
-                  />
+                <div className="flex h-[168px] w-[168px] items-center justify-center rounded-2xl bg-white p-3">
+                  {qrOrigin && (
+                    <QRCodeSVG
+                      value={`${qrOrigin}/cardapio?casa=duque-de-caxias&mesa=12`}
+                      size={168}
+                      level="M"
+                      fgColor="#1a1108"
+                    />
+                  )}
                 </div>
                 <p className="text-center text-xs text-muted-foreground">
                   Aponte a câmera do celular para o código

@@ -7,7 +7,12 @@ const SYSTEM_BASE =
   "Você é o assistente virtual do Afya Grill, uma hamburgueria. Responda sempre em português do Brasil, " +
   "de forma simpática e direta. Nunca invente pratos, preços, unidades ou promoções que não existam nos dados abaixo.";
 
+// dishes/units são dados estáticos do módulo — montar essas strings uma única vez
+// (em vez de a cada chamada de IA) evita trabalho repetido sem nenhum ganho, já que
+// o conteúdo nunca muda em runtime.
+let cachedSiteContext: string | undefined;
 function siteContext() {
+  if (cachedSiteContext) return cachedSiteContext;
   const cardapio = dishes
     .map(
       (d) =>
@@ -23,7 +28,7 @@ function siteContext() {
     )
     .join("\n");
 
-  return (
+  cachedSiteContext =
     `CARDÁPIO COMPLETO (${dishes.length} itens):\n${cardapio}\n\n` +
     `UNIDADES DO AFYA GRILL:\n${unidades}\n\n` +
     "COMO O SITE FUNCIONA:\n" +
@@ -34,11 +39,12 @@ function siteContext() {
     "Pix, cartão de crédito ou débito. Frete é grátis para pedidos a partir de R$ 150 (abaixo disso custa R$ 12,90). " +
     'O cupom "MESA10" dá 10% de desconto.\n' +
     "- /reservas: reservar mesa em 3 passos (escolher filial, depois data/horário/nº de pessoas, depois dados " +
-    "pessoais), ou descrever a reserva em uma frase livre e o formulário se preenche sozinho."
-  );
+    "pessoais), ou descrever a reserva em uma frase livre e o formulário se preenche sozinho.";
+  return cachedSiteContext;
 }
 
-function lightCatalog() {
+let cachedLightCatalog: ReturnType<typeof buildLightCatalog> | undefined;
+function buildLightCatalog() {
   return dishes.map(({ id, name, category, price, tags, description }) => ({
     id,
     name,
@@ -47,6 +53,10 @@ function lightCatalog() {
     tags,
     description,
   }));
+}
+function lightCatalog() {
+  if (!cachedLightCatalog) cachedLightCatalog = buildLightCatalog();
+  return cachedLightCatalog;
 }
 
 const ITEM_IDS_SCHEMA = {
