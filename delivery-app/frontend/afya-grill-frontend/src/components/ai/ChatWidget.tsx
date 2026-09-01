@@ -3,6 +3,8 @@ import { Loader2, MessageCircle, Send, Sparkles, Trash2, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { aiChat } from "@/lib/ai";
+import { localChatReply } from "@/lib/chatFallback";
+import { useAiRace } from "@/lib/useAiRace";
 
 type ChatMessage = { role: "user" | "model"; text: string };
 
@@ -18,6 +20,7 @@ export function ChatWidget() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const race = useAiRace();
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -25,24 +28,27 @@ export function ChatWidget() {
 
   if (pathname.startsWith("/admin")) return null;
 
-  async function send() {
+  function send() {
     const text = input.trim();
     if (!text || loading) return;
     const next: ChatMessage[] = [...messages, { role: "user", text }];
     setMessages(next);
     setInput("");
     setLoading(true);
-    try {
-      const { reply } = await aiChat({ data: { messages: next } });
-      setMessages((prev) => [...prev, { role: "model", text: reply }]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        { role: "model", text: "Ops, não consegui responder agora. Tenta de novo em instantes?" },
-      ]);
-    } finally {
-      setLoading(false);
-    }
+
+    // Corre a resposta da IA contra um fallback local por palavra-chave: se o Gemini
+    // demorar mais que ~2,5s, o usuário já recebe uma resposta útil nesse meio-tempo em
+    // vez de ficar com o spinner girando. upgrade:false porque, num chat, não faz sentido
+    // "trocar" uma mensagem que o usuário já leu por outra chegando atrasada.
+    race(
+      () => aiChat({ data: { messages: next } }).then((r) => r.reply),
+      () => localChatReply(text),
+      (reply) => {
+        setMessages((prev) => [...prev, { role: "model", text: reply }]);
+        setLoading(false);
+      },
+      { upgrade: false },
+    );
   }
 
   return (

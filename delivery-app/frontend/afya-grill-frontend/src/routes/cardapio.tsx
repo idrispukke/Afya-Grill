@@ -23,6 +23,8 @@ import { categories, dishes, type Dish } from "@/data/menu";
 import { units } from "@/data/units";
 import { aiSemanticSearch } from "@/lib/ai";
 import { useCart } from "@/lib/cart";
+import { searchDishes } from "@/lib/dishSearch";
+import { useAiRace } from "@/lib/useAiRace";
 
 const searchSchema = z.object({
   casa: z.string().optional(),
@@ -51,18 +53,22 @@ function CardapioDigital() {
   const [selected, setSelected] = useState<Dish | null>(null);
   const [aiOrder, setAiOrder] = useState<string[] | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const race = useAiRace();
 
-  async function buscaInteligente() {
+  function buscaInteligente() {
     if (!busca.trim() || aiLoading) return;
     setAiLoading(true);
-    try {
-      const { itemIds } = await aiSemanticSearch({ data: { query: busca } });
-      setAiOrder(itemIds);
-    } catch {
-      toast.error("Não consegui buscar agora, tenta de novo.");
-    } finally {
-      setAiLoading(false);
-    }
+    const q = busca;
+    // Se o Gemini demorar mais que ~2,5s, usa a busca local por palavras-chave nesse
+    // meio-tempo, e troca pelo resultado da IA se ele chegar em seguida.
+    race(
+      () => aiSemanticSearch({ data: { query: q } }).then((r) => r.itemIds),
+      () => searchDishes(q, dishes.length).map((d) => d.id),
+      (itemIds) => {
+        setAiOrder(itemIds);
+        setAiLoading(false);
+      },
+    );
   }
 
   // O cardápio é o mesmo em todas as unidades hoje; o "casa" na URL só

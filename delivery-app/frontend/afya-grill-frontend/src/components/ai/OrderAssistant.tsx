@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { brl, dishes, type Dish } from "@/data/menu";
 import { aiOrderAssistant } from "@/lib/ai";
 import { useCart } from "@/lib/cart";
+import { localOrderMessage, searchDishes } from "@/lib/dishSearch";
+import { useAiRace } from "@/lib/useAiRace";
 
 const SUGESTOES = [
   "Algo picante e sem carne",
@@ -20,27 +22,34 @@ export function OrderAssistant() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [results, setResults] = useState<Dish[] | null>(null);
+  const race = useAiRace();
 
-  async function ask(text?: string) {
+  function ask(text?: string) {
     const q = (text ?? query).trim();
     if (!q || loading) return;
     setQuery(q);
     setLoading(true);
     setMessage(null);
     setResults(null);
-    try {
-      const { message, itemIds } = await aiOrderAssistant({ data: { query: q } });
-      const matched = itemIds
-        .map((id) => dishes.find((d) => d.id === id))
-        .filter((d): d is Dish => Boolean(d));
-      setMessage(message);
-      setResults(matched);
-    } catch {
-      setMessage("Não consegui pensar em nada agora. Tenta descrever de outro jeito?");
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
+
+    // Se o Gemini não responder em ~2,5s, mostra na hora um resultado calculado local
+    // (busca por palavras-chave no cardápio) — e troca pela resposta da IA se ela chegar
+    // depois, já que é mais precisa.
+    race(
+      () => aiOrderAssistant({ data: { query: q } }),
+      () => {
+        const matched = searchDishes(q, 4);
+        return { message: localOrderMessage(matched), itemIds: matched.map((d) => d.id) };
+      },
+      ({ message, itemIds }) => {
+        const matched = itemIds
+          .map((id) => dishes.find((d) => d.id === id))
+          .filter((d): d is Dish => Boolean(d));
+        setMessage(message);
+        setResults(matched);
+        setLoading(false);
+      },
+    );
   }
 
   return (
