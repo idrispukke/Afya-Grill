@@ -18,13 +18,14 @@ export const units: Unit[] = [
     name: "Afya Grill Duque de Caxias",
     bairro: "Centro",
     cidade: "Duque de Caxias",
-    endereco: "Av. Presidente Vargas, 1200 — Centro, Duque de Caxias, RJ",
+    endereco:
+      ": R Professor José de Souza Herdy, 1216 - Jardim Vinte e Cinco de Agosto, Duque de Caxias - RJ, 25071-202",
     telefone: "(21) 3555-0101",
     especialidade: "Grill",
     rating: "4.9",
     time: "25 min",
-    lat: -22.7858,
-    lng: -43.3053,
+    lat: -22.7891,
+    lng: -43.3059,
   },
   {
     id: "copacabana",

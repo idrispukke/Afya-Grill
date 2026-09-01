@@ -70,7 +70,9 @@ export function OverviewSection() {
   const faturamento = orders.reduce((a, o) => a + o.total, 0) * fator;
   const nota = reviews.reduce((a, r) => a + r.nota, 0) / reviews.length;
   const aRepassar = payouts.filter((p) => p.status === "Pendente").reduce((a, p) => a + p.bruto, 0);
-  const pedidosEmAndamento = orders.filter((o) => o.status === "Novo" || o.status === "Preparando");
+  const pedidosEmAndamento = orders.filter(
+    (o) => o.status === "Novo" || o.status === "Em preparo" || o.status === "Pronto",
+  );
   const reservasPendentes = reservations.filter((r) => r.status === "Pendente");
   const produtosAtivos = products.filter((p) => p.ativo);
   const casasAbertas = houses.filter((h) => h.ativo);
@@ -121,7 +123,9 @@ export function OverviewSection() {
 
             <div className="grid gap-3 sm:grid-cols-3 lg:w-[420px] lg:grid-cols-1">
               <div className="rounded-2xl border border-border/70 bg-surface p-4">
-                <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">Agora</p>
+                <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+                  Agora
+                </p>
                 <p className="mt-1 font-display text-2xl">{pedidosEmAndamento.length}</p>
                 <p className="mt-1 text-xs text-muted-foreground">Pedidos em andamento</p>
               </div>

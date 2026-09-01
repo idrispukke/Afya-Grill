@@ -1,15 +1,45 @@
-export type OrderStatus = "Novo" | "Preparando" | "A caminho" | "Entregue" | "Cancelado";
+export type OrderStatus = "Novo" | "Em preparo" | "Pronto" | "A caminho" | "Entregue" | "Cancelado";
+
+/** "mesa" = pedido feito à mesa (consumo no local), "delivery" = entrega no endereço do cliente. */
+export type OrderChannel = "mesa" | "delivery";
+
+export type OrderItemLine = {
+  nome: string;
+  qtd: number;
+  preco: number;
+};
+
+export type OrderHistoryEntry = {
+  status: OrderStatus;
+  em: number;
+};
 
 export type AdminOrder = {
   id: string;
   cliente: string;
+  telefone?: string | undefined;
   casa: string;
+  unidadeId?: string | undefined;
   itens: string;
+  itensDetalhados?: OrderItemLine[] | undefined;
   total: number;
   pagamento: "Pix" | "Cartão" | "Dinheiro";
   status: OrderStatus;
   criadoEm: string;
+  criadoEmMs: number;
   entregador: string;
+  entregadorId?: string | undefined;
+
+  channel: OrderChannel;
+  mesa?: number | undefined;
+  endereco?: string | undefined;
+
+  /** Só para pedidos delivery: coordenadas simuladas do destino e progresso da corrida. */
+  destino?: { lat: number; lng: number } | undefined;
+  aceitoEmMs?: number | undefined;
+  etaMs?: number | undefined;
+
+  historico: OrderHistoryEntry[];
 };
 
 export type AdminProduct = {
@@ -114,28 +144,127 @@ export type AdminTable = {
   scans: number;
 };
 
+const minutesAgo = (min: number) => Date.now() - min * 60_000;
+
 export const seedOrders: AdminOrder[] = [
+  {
+    id: "AFY-2040",
+    cliente: "Beatriz Nogueira",
+    casa: "Afya Grill Duque de Caxias",
+    unidadeId: "duque-de-caxias",
+    itens: "1x Smash Ouro, 1x Batata Rústica Cheddar Bacon",
+    itensDetalhados: [
+      { nome: "Smash Ouro", qtd: 1, preco: 48.9 },
+      { nome: "Batata Rústica Cheddar Bacon", qtd: 1, preco: 26.9 },
+    ],
+    total: 75.8,
+    pagamento: "Pix",
+    status: "Novo",
+    criadoEm: "20:39",
+    criadoEmMs: minutesAgo(1),
+    entregador: "",
+    channel: "mesa",
+    mesa: 4,
+    historico: [{ status: "Novo", em: minutesAgo(1) }],
+  },
   {
     id: "AFY-2041",
     cliente: "Marina Duarte",
+    telefone: "(21) 98812-4410",
     casa: "Afya Grill Duque de Caxias",
+    unidadeId: "duque-de-caxias",
     itens: "2x Smash Ouro",
+    itensDetalhados: [{ nome: "Smash Ouro", qtd: 2, preco: 48.9 }],
     total: 97.8,
     pagamento: "Pix",
-    status: "Preparando",
+    status: "Em preparo",
     criadoEm: "20:14",
-    entregador: "Rafael Lima",
+    criadoEmMs: minutesAgo(9),
+    entregador: "",
+    channel: "delivery",
+    endereco: "Rua das Palmeiras, 88 — Jardim 25 de Agosto",
+    destino: { lat: -22.7935, lng: -43.301 },
+    historico: [
+      { status: "Novo", em: minutesAgo(9) },
+      { status: "Em preparo", em: minutesAgo(6) },
+    ],
   },
   {
     id: "AFY-2042",
     cliente: "Caio Bentes",
+    telefone: "(21) 99604-7723",
     casa: "Afya Grill Botafogo",
+    unidadeId: "botafogo",
     itens: "1x Omakase 15 peças",
+    itensDetalhados: [{ nome: "Omakase 15 peças", qtd: 1, preco: 139 }],
     total: 139,
     pagamento: "Cartão",
     status: "A caminho",
     criadoEm: "20:31",
+    criadoEmMs: minutesAgo(14),
     entregador: "Bruna Alves",
+    entregadorId: "e2",
+    channel: "delivery",
+    endereco: "Rua Voluntários da Pátria, 320 — Botafogo",
+    destino: { lat: -22.9558, lng: -43.1861 },
+    aceitoEmMs: minutesAgo(2),
+    etaMs: 110_000,
+    historico: [
+      { status: "Novo", em: minutesAgo(14) },
+      { status: "Em preparo", em: minutesAgo(12) },
+      { status: "Pronto", em: minutesAgo(4) },
+      { status: "A caminho", em: minutesAgo(2) },
+    ],
+  },
+  {
+    id: "AFY-2043",
+    cliente: "Thiago Andrade",
+    casa: "Afya Grill Duque de Caxias",
+    unidadeId: "duque-de-caxias",
+    itens: "1x Lava Gold, 2x Refrigerante Lata",
+    itensDetalhados: [
+      { nome: "Lava Gold", qtd: 1, preco: 34 },
+      { nome: "Refrigerante Lata", qtd: 2, preco: 8 },
+    ],
+    total: 50,
+    pagamento: "Dinheiro",
+    status: "Pronto",
+    criadoEm: "20:36",
+    criadoEmMs: minutesAgo(4),
+    entregador: "",
+    channel: "mesa",
+    mesa: 8,
+    historico: [
+      { status: "Novo", em: minutesAgo(4) },
+      { status: "Em preparo", em: minutesAgo(3) },
+      { status: "Pronto", em: minutesAgo(1) },
+    ],
+  },
+  {
+    id: "AFY-2044",
+    cliente: "Luiza Fontes",
+    telefone: "(21) 98221-7734",
+    casa: "Afya Grill Duque de Caxias",
+    unidadeId: "duque-de-caxias",
+    itens: "1x Duplo Bacon, 1x Milkshake Chocolate",
+    itensDetalhados: [
+      { nome: "Duplo Bacon", qtd: 1, preco: 42.9 },
+      { nome: "Milkshake Chocolate", qtd: 1, preco: 19.9 },
+    ],
+    total: 62.8,
+    pagamento: "Cartão",
+    status: "Pronto",
+    criadoEm: "20:41",
+    criadoEmMs: minutesAgo(2),
+    entregador: "",
+    channel: "delivery",
+    endereco: "Av. Presidente Vargas, 540 — Centro",
+    destino: { lat: -22.7862, lng: -43.309 },
+    historico: [
+      { status: "Novo", em: minutesAgo(2) },
+      { status: "Em preparo", em: minutesAgo(2) },
+      { status: "Pronto", em: minutesAgo(0.3) },
+    ],
   },
 ];
 
@@ -436,7 +565,8 @@ export const ordersByHour = [
 
 export const statusFlow: OrderStatus[] = [
   "Novo",
-  "Preparando",
+  "Em preparo",
+  "Pronto",
   "A caminho",
   "Entregue",
   "Cancelado",

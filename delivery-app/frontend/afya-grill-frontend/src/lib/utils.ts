@@ -14,5 +14,5 @@ export function slugify(v: string) {
 
 export function siteOrigin() {
   if (typeof window !== "undefined") return window.location.origin;
-  return "https://afyagrill.com.br";
+  return "https://afya-grill.vercel.app";
 }

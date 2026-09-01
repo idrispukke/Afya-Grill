@@ -45,8 +45,18 @@ const SECTION_IDS = nav.map((n) => n.id);
 
 const notifications = [
   { id: 1, title: "Novo pedido recebido", detail: "AFY-2043 · Afya Grill Botafogo", time: "agora" },
-  { id: 2, title: "Reserva aguardando confirmação", detail: "AFY-R483 · Thiago Andrade", time: "40min atrás" },
-  { id: 3, title: "Avaliação aguardando resposta", detail: "Caio Bentes · Afya Grill Botafogo", time: "3h atrás" },
+  {
+    id: 2,
+    title: "Reserva aguardando confirmação",
+    detail: "AFY-R483 · Thiago Andrade",
+    time: "40min atrás",
+  },
+  {
+    id: 3,
+    title: "Avaliação aguardando resposta",
+    detail: "Caio Bentes · Afya Grill Botafogo",
+    time: "3h atrás",
+  },
 ];
 
 function useClickOutside<T extends HTMLElement>(onOutside: () => void) {

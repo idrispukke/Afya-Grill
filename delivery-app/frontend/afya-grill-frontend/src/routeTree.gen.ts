@@ -13,6 +13,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as CardapioRouteImport } from './routes/cardapio'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
+import { Route as CozinhaRouteImport } from './routes/cozinha'
+import { Route as GarcomRouteImport } from './routes/garcom'
+import { Route as MotoboyRouteImport } from './routes/motoboy'
 import { Route as ReservasRouteImport } from './routes/reservas'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 
@@ -36,6 +39,21 @@ const CarrinhoRoute = CarrinhoRouteImport.update({
   path: '/carrinho',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CozinhaRoute = CozinhaRouteImport.update({
+  id: '/cozinha',
+  path: '/cozinha',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GarcomRoute = GarcomRouteImport.update({
+  id: '/garcom',
+  path: '/garcom',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MotoboyRoute = MotoboyRouteImport.update({
+  id: '/motoboy',
+  path: '/motoboy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReservasRoute = ReservasRouteImport.update({
   id: '/reservas',
   path: '/reservas',
@@ -52,6 +70,9 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
+  '/cozinha': typeof CozinhaRoute
+  '/garcom': typeof GarcomRoute
+  '/motoboy': typeof MotoboyRoute
   '/reservas': typeof ReservasRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -59,6 +80,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
+  '/cozinha': typeof CozinhaRoute
+  '/garcom': typeof GarcomRoute
+  '/motoboy': typeof MotoboyRoute
   '/reservas': typeof ReservasRoute
   '/admin': typeof AdminIndexRoute
 }
@@ -68,21 +92,43 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
+  '/cozinha': typeof CozinhaRoute
+  '/garcom': typeof GarcomRoute
+  '/motoboy': typeof MotoboyRoute
   '/reservas': typeof ReservasRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/admin' | '/cardapio' | '/carrinho' | '/reservas' | '/admin/'
+    | '/'
+    | '/admin'
+    | '/cardapio'
+    | '/carrinho'
+    | '/cozinha'
+    | '/garcom'
+    | '/motoboy'
+    | '/reservas'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cardapio' | '/carrinho' | '/reservas' | '/admin'
+  to:
+    | '/'
+    | '/cardapio'
+    | '/carrinho'
+    | '/cozinha'
+    | '/garcom'
+    | '/motoboy'
+    | '/reservas'
+    | '/admin'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/cardapio'
     | '/carrinho'
+    | '/cozinha'
+    | '/garcom'
+    | '/motoboy'
     | '/reservas'
     | '/admin/'
   fileRoutesById: FileRoutesById
@@ -92,6 +138,9 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   CardapioRoute: typeof CardapioRoute
   CarrinhoRoute: typeof CarrinhoRoute
+  CozinhaRoute: typeof CozinhaRoute
+  GarcomRoute: typeof GarcomRoute
+  MotoboyRoute: typeof MotoboyRoute
   ReservasRoute: typeof ReservasRoute
 }
 
@@ -123,6 +172,27 @@ declare module '@tanstack/react-router' {
       path: '/carrinho'
       fullPath: '/carrinho'
       preLoaderRoute: typeof CarrinhoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cozinha': {
+      id: '/cozinha'
+      path: '/cozinha'
+      fullPath: '/cozinha'
+      preLoaderRoute: typeof CozinhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/garcom': {
+      id: '/garcom'
+      path: '/garcom'
+      fullPath: '/garcom'
+      preLoaderRoute: typeof GarcomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/motoboy': {
+      id: '/motoboy'
+      path: '/motoboy'
+      fullPath: '/motoboy'
+      preLoaderRoute: typeof MotoboyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reservas': {
@@ -157,6 +227,9 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   CardapioRoute: CardapioRoute,
   CarrinhoRoute: CarrinhoRoute,
+  CozinhaRoute: CozinhaRoute,
+  GarcomRoute: GarcomRoute,
+  MotoboyRoute: MotoboyRoute,
   ReservasRoute: ReservasRoute,
 }
 export const routeTree = rootRouteImport

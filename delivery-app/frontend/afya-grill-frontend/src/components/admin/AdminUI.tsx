@@ -5,6 +5,7 @@ import {
   Area,
   AreaChart,
   Cell,
+  LabelList,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -159,7 +160,9 @@ export function StatCard({
       className="group relative overflow-hidden rounded-3xl border border-border bg-card p-5 shadow-soft"
     >
       <div className="flex items-center justify-between gap-3">
-        <span className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">{label}</span>
+        <span className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">
+          {label}
+        </span>
         {icon && (
           <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-secondary text-primary transition-transform duration-300 group-hover:scale-110">
             {icon}
@@ -346,9 +349,9 @@ export function ActionButton({
   children,
   onClick,
   tone = "ghost",
-      type = "button",
-      "aria-label": ariaLabel,
-    }: {
+  type = "button",
+  "aria-label": ariaLabel,
+}: {
   children: ReactNode;
   onClick?: () => void;
   tone?: "ghost" | "primary" | "danger";
