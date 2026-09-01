@@ -1,17 +1,21 @@
 import { useState } from "react";
 import {
+  ArrowUpRight,
   Bike,
   CalendarCheck2,
+  Clock3,
   DollarSign,
-  ReceiptText,
-  Star,
-  UtensilsCrossed,
+  Flame,
   QrCode,
+  ReceiptText,
+  ShieldCheck,
+  Star,
   Store,
-  Users,
   TicketPercent,
-  Wallet,
   UserCog,
+  Users,
+  UtensilsCrossed,
+  Wallet,
 } from "lucide-react";
 import {
   AreaTrend,
@@ -58,21 +62,138 @@ export function OverviewSection() {
     payouts,
     tables,
   } = useAdmin();
+
   const [periodo, setPeriodo] = useState<(typeof periodos)[number]>("Hoje");
   const fator = fatorPeriodo[periodo];
+
   const pedidosPeriodo = Math.round(orders.length * fator);
   const faturamento = orders.reduce((a, o) => a + o.total, 0) * fator;
   const nota = reviews.reduce((a, r) => a + r.nota, 0) / reviews.length;
   const aRepassar = payouts.filter((p) => p.status === "Pendente").reduce((a, p) => a + p.bruto, 0);
+  const pedidosEmAndamento = orders.filter(
+    (o) => o.status === "Novo" || o.status === "Em preparo" || o.status === "Pronto",
+  );
+  const reservasPendentes = reservations.filter((r) => r.status === "Pendente");
+  const produtosAtivos = products.filter((p) => p.ativo);
+  const casasAbertas = houses.filter((h) => h.ativo);
+  const cuponsAtivos = coupons.filter((c) => c.ativo);
+  const reviewsPendentes = reviews.filter((r) => !r.respondido);
+  const ticketMedio = faturamento / Math.max(pedidosPeriodo, 1);
   const reservasHoje = reservations
     .filter((r) => r.data === TODAY)
     .sort((a, b) => (a.hora < b.hora ? -1 : 1));
 
   return (
     <section id="dashboard" className="scroll-mt-24">
-      <PageHeader title="Dashboard" subtitle="Toda a operação da Afya Grill num só lugar." />
+      <PageHeader
+        eyebrow="Afya Grill Admin"
+        title="Dashboard"
+        subtitle="Toda a operação da Afya Grill num só lugar, com leitura rápida de pedidos, reservas, unidades e financeiro."
+      />
 
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4 grid gap-4 xl:grid-cols-[1.7fr_1fr]">
+        <Panel className="overflow-hidden">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary/80">
+                Resumo executivo
+              </p>
+              <h2 className="mt-3 font-display text-3xl tracking-tight sm:text-4xl">
+                O painel ficou mais claro para agir rápido.
+              </h2>
+              <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground sm:text-[0.95rem]">
+                Aqui você acompanha a operação com menos ruído visual, leitura direta e atalhos
+                rápidos para o que realmente muda ao longo do dia.
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                <Pill tone="good">
+                  <ShieldCheck className="mr-1 h-3.5 w-3.5" />
+                  Painel protegido
+                </Pill>
+                <Pill tone="warn">
+                  <Clock3 className="mr-1 h-3.5 w-3.5" />
+                  Atualização contínua
+                </Pill>
+                <Pill tone="neutral">
+                  <Flame className="mr-1 h-3.5 w-3.5" />
+                  Operação ativa
+                </Pill>
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-3 lg:w-[420px] lg:grid-cols-1">
+              <div className="rounded-2xl border border-border/70 bg-surface p-4">
+                <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+                  Agora
+                </p>
+                <p className="mt-1 font-display text-2xl">{pedidosEmAndamento.length}</p>
+                <p className="mt-1 text-xs text-muted-foreground">Pedidos em andamento</p>
+              </div>
+              <div className="rounded-2xl border border-border/70 bg-surface p-4">
+                <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+                  Pendências
+                </p>
+                <p className="mt-1 font-display text-2xl">{reservasPendentes.length}</p>
+                <p className="mt-1 text-xs text-muted-foreground">Reservas aguardando ação</p>
+              </div>
+              <div className="rounded-2xl border border-border/70 bg-surface p-4">
+                <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+                  Financeiro
+                </p>
+                <p className="mt-1 font-display text-2xl">{brlInt(aRepassar)}</p>
+                <p className="mt-1 text-xs text-muted-foreground">Valor a repassar</p>
+              </div>
+            </div>
+          </div>
+        </Panel>
+
+        <Panel>
+          <div className="flex h-full flex-col justify-between gap-4">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+                Leituras rápidas
+              </p>
+              <h3 className="mt-2 font-display text-xl tracking-tight">Indicadores de atenção</h3>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between rounded-2xl bg-surface px-4 py-3">
+                <div>
+                  <p className="text-sm font-medium">Ticket médio</p>
+                  <p className="text-xs text-muted-foreground">Receita média por pedido</p>
+                </div>
+                <p className="font-display text-xl">{brl(ticketMedio)}</p>
+              </div>
+              <div className="flex items-center justify-between rounded-2xl bg-surface px-4 py-3">
+                <div>
+                  <p className="text-sm font-medium">Unidades ativas</p>
+                  <p className="text-xs text-muted-foreground">Casas abertas agora</p>
+                </div>
+                <p className="font-display text-xl">
+                  {casasAbertas.length}/{houses.length}
+                </p>
+              </div>
+              <div className="flex items-center justify-between rounded-2xl bg-surface px-4 py-3">
+                <div>
+                  <p className="text-sm font-medium">Pendências abertas</p>
+                  <p className="text-xs text-muted-foreground">Pedidos, reviews e reservas</p>
+                </div>
+                <p className="font-display text-xl">
+                  {pedidosEmAndamento.length + reviewsPendentes.length + reservasPendentes.length}
+                </p>
+              </div>
+            </div>
+            <a
+              href="#pedidos"
+              className="inline-flex items-center gap-2 text-sm font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Ir para pedidos
+              <ArrowUpRight className="h-4 w-4" />
+            </a>
+          </div>
+        </Panel>
+      </div>
+
+      <div className="mb-4 flex flex-wrap gap-2">
         {periodos.map((p) => (
           <button
             key={p}
@@ -143,13 +264,10 @@ export function OverviewSection() {
           <DonutChart data={categorySplit} nameKey="categoria" valueKey="valor" />
         </Panel>
 
-        <Panel
-          title="Reservas de hoje"
-          description={`${reservasHoje.length} agendamento(s) via site e QR Code`}
-        >
+        <Panel title="Reservas do dia" description={`${reservasHoje.length} agendamento(s)`}>
           {reservasHoje.length === 0 ? (
             <p className="py-6 text-center text-sm text-muted-foreground">
-              Nenhuma reserva para hoje ainda.
+              Nenhuma reserva para o dia atual ainda.
             </p>
           ) : (
             <ul className="space-y-3">
@@ -238,7 +356,7 @@ export function OverviewSection() {
       <div className="mb-4 mt-8">
         <h2 className="font-display text-xl tracking-tight">Acompanhe toda a loja</h2>
         <p className="text-sm text-muted-foreground">
-          Um resumo rápido de cada área da operação — clique num card para rolar até ela.
+          Um resumo rápido de cada área da operação - clique num card para rolar até ela.
         </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -248,7 +366,7 @@ export function OverviewSection() {
           icon={<CalendarCheck2 className="h-4.5 w-4.5" />}
           title="Reservas"
           hint="aguardando resposta"
-          metric={String(reservations.filter((r) => r.status === "Pendente").length)}
+          metric={String(reservasPendentes.length)}
         />
         <LinkCard
           index={1}
@@ -256,7 +374,7 @@ export function OverviewSection() {
           icon={<UtensilsCrossed className="h-4.5 w-4.5" />}
           title="Cardápio"
           hint="itens ativos"
-          metric={`${products.filter((p) => p.ativo).length}/${products.length}`}
+          metric={`${produtosAtivos.length}/${products.length}`}
         />
         <LinkCard
           index={2}
@@ -272,7 +390,7 @@ export function OverviewSection() {
           icon={<Store className="h-4.5 w-4.5" />}
           title="Unidades"
           hint="unidades abertas agora"
-          metric={`${houses.filter((h) => h.ativo).length}/${houses.length}`}
+          metric={`${casasAbertas.length}/${houses.length}`}
         />
         <LinkCard
           index={4}
@@ -288,7 +406,7 @@ export function OverviewSection() {
           icon={<TicketPercent className="h-4.5 w-4.5" />}
           title="Cupons"
           hint="cupons ativos agora"
-          metric={String(coupons.filter((c) => c.ativo).length)}
+          metric={String(cuponsAtivos.length)}
         />
         <LinkCard
           index={6}
@@ -296,7 +414,7 @@ export function OverviewSection() {
           icon={<Star className="h-4.5 w-4.5" />}
           title="Avaliações"
           hint="aguardando resposta"
-          metric={String(reviews.filter((r) => !r.respondido).length)}
+          metric={String(reviewsPendentes.length)}
         />
         <LinkCard
           index={7}

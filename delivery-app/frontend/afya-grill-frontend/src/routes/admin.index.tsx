@@ -16,7 +16,7 @@ import { ConfiguracoesSection } from "@/components/admin/sections/ConfiguracoesS
 export const Route = createFileRoute("/admin/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Painel Afya Grill" },
+      { title: "Dashboard - Painel Afya Grill" },
       {
         name: "description",
         content:
