@@ -5,12 +5,15 @@ import { toast } from "sonner";
 import { brl, dishes, type Dish } from "@/data/menu";
 import { aiCrossSell } from "@/lib/ai";
 import { useCart, type CartItem } from "@/lib/cart";
+import { crossSellSuggestions, localCrossSellMessage } from "@/lib/dishSearch";
+import { useAiRace } from "@/lib/useAiRace";
 
 export function CrossSell({ items }: { items: CartItem[] }) {
   const { add } = useCart();
   const [message, setMessage] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<Dish[]>([]);
   const [loading, setLoading] = useState(false);
+  const race = useAiRace();
 
   const cartItemIds = items
     .map((i) => i.id)
@@ -23,27 +26,29 @@ export function CrossSell({ items }: { items: CartItem[] }) {
       setSuggestions([]);
       return;
     }
-    let cancelled = false;
     setLoading(true);
-    aiCrossSell({ data: { cartItemIds: cartItemIds.split(",") } })
-      .then(({ message, itemIds }) => {
-        if (cancelled) return;
+    const ids = cartItemIds.split(",");
+    const cartDishes = ids
+      .map((id) => dishes.find((d) => d.id === id))
+      .filter((d): d is Dish => Boolean(d));
+
+    // Se o Gemini demorar mais que ~2,5s, sugere via regra local (categoria complementar)
+    // nesse meio-tempo, e troca pela sugestão da IA se ela chegar depois.
+    race(
+      () => aiCrossSell({ data: { cartItemIds: ids } }),
+      () => {
+        const sugg = crossSellSuggestions(cartDishes, 2);
+        return { message: localCrossSellMessage(cartDishes, sugg), itemIds: sugg.map((d) => d.id) };
+      },
+      ({ message, itemIds }) => {
         setMessage(message || null);
         setSuggestions(
           itemIds.map((id) => dishes.find((d) => d.id === id)).filter((d): d is Dish => Boolean(d)),
         );
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setMessage(null);
-          setSuggestions([]);
-        }
-      })
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, [cartItemIds]);
+        setLoading(false);
+      },
+    );
+  }, [cartItemIds, race]);
 
   if (!loading && suggestions.length === 0) return null;
 

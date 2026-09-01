@@ -49,11 +49,32 @@ manualmente ao criar o projeto na Vercel (não existe equivalente disso em `verc
 4. **Build Command**: `npm run build` (detectado automaticamente do `package.json`).
 5. **Install Command**: `npm ci` / `npm install` (detectado automaticamente pelo
    `package-lock.json`).
-6. **Environment Variables**: nenhuma é necessária hoje — o app usa dados mock locais
-   (`src/data/*.ts`), sem chamadas a API externa nem variáveis `VITE_*`/`process.env`.
+6. **Environment Variables** — em **Project Settings → Environment Variables**, adicione:
 
-Depois de configurar o Root Directory uma vez, todo `git push` na branch de produção dispara um
-deploy automático sem nenhum passo manual adicional.
+   | Nome | Obrigatória? | Onde conseguir |
+   |---|---|---|
+   | `GEMINI_API_KEY` | **Sim** — sem ela as 5 funcionalidades de IA (chatbot, assistente de pedido, cross-sell, assistente de reservas, busca semântica) ficam fora do ar em produção | Gerar em [aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
+   | `VITE_SUPABASE_URL` | Sim — usada pelo cardápio/Supabase | Painel do projeto no [supabase.com](https://supabase.com) → Project Settings → API |
+   | `VITE_SUPABASE_PUBLISHABLE_KEY` | Sim — idem acima | Mesmo lugar, chave "publishable"/"anon" |
+   | `GEMINI_MODEL` | Não (opcional) | Só se precisar forçar um modelo diferente do padrão (`gemini-flash-lite-latest`) |
+
+   **Importante sobre `GEMINI_API_KEY`:** ela é lida só no servidor (dentro das server
+   functions em `src/lib/ai.ts`), nunca é enviada ao navegador — por isso o nome **não**
+   leva o prefixo `VITE_` (variáveis `VITE_*` são embutidas no bundle do cliente e ficariam
+   públicas; `GEMINI_API_KEY` sem esse prefixo fica só acessível via `process.env` no lado
+   servidor, que é exatamente o que `src/server/gemini.ts` espera).
+
+   Marque as três variáveis obrigatórias para os ambientes **Production**, **Preview** e
+   **Development** (os três checkboxes que a Vercel mostra ao adicionar a variável) — senão
+   os deploys de preview (de cada PR) ficam com a IA quebrada mesmo com a produção
+   funcionando.
+
+   Depois de adicionar/alterar uma env var em um projeto que já tinha deploy, é preciso
+   fazer um **novo deploy** (Redeploy no dashboard, ou um novo `git push`) para o valor
+   entrar em vigor — a Vercel não aplica env vars retroativamente a builds já feitos.
+
+Depois de configurar o Root Directory e as variáveis de ambiente uma vez, todo `git push` na
+branch de produção dispara um deploy automático sem nenhum passo manual adicional.
 
 ## Deploy via CLI (alternativa)
 
@@ -67,3 +88,34 @@ npx vercel --prod # deploy de produção
 
 Rodando a partir desta pasta, a CLI já usa o diretório correto como raiz do projeto — não
 depende da configuração de Root Directory do passo anterior.
+
+Para configurar as variáveis de ambiente pela CLI em vez do dashboard (equivalente ao passo 6
+acima):
+
+```sh
+cd delivery-app/frontend/afya-grill-frontend
+npx vercel env add GEMINI_API_KEY production
+npx vercel env add GEMINI_API_KEY preview
+npx vercel env add VITE_SUPABASE_URL production
+npx vercel env add VITE_SUPABASE_URL preview
+npx vercel env add VITE_SUPABASE_PUBLISHABLE_KEY production
+npx vercel env add VITE_SUPABASE_PUBLISHABLE_KEY preview
+```
+
+Cada comando pede o valor da variável de forma interativa (não fica no histórico do terminal).
+Depois de rodar, é preciso disparar um novo deploy (`npx vercel --prod` ou um `git push`) para
+o valor entrar em vigor.
+
+## Checklist rápido para quem for fazer o deploy
+
+- [ ] Repositório importado na Vercel com **Root Directory** =
+      `delivery-app/frontend/afya-grill-frontend`
+- [ ] `GEMINI_API_KEY` configurada (Production **e** Preview)
+- [ ] `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` configuradas (Production **e**
+      Preview)
+- [ ] Deploy disparado/rodado depois de configurar as variáveis (env var só vale a partir do
+      próximo build)
+- [ ] Testar em produção: abrir o chatbot flutuante e mandar uma mensagem — se responder, a
+      `GEMINI_API_KEY` está correta; se aparecer erro genérico "não consegui responder agora",
+      revisar a chave (foi copiada certa? tem espaço em branco sobrando? o projeto no Google AI
+      Studio ainda está ativo?).

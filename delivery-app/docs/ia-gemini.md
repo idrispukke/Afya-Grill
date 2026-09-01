@@ -68,8 +68,18 @@ de ambiente `GEMINI_MODEL` se necessário.
    ```
    (chave gerada no [Google AI Studio](https://aistudio.google.com/apikey))
 2. Opcionalmente, defina `GEMINI_MODEL` para forçar outro modelo.
-3. Em produção na Cloudflare (o app usa `nitro/vite` com preset `cloudflare-module`),
-   defina o segredo com `wrangler secret put GEMINI_API_KEY` em vez de usar o `.env.local`.
+3. **Em produção na Vercel** (é onde este projeto é hospedado — ver
+   `delivery-app/frontend/afya-grill-frontend/VERCEL.md`): a chave **não** vem do
+   `.env.local` (que é gitignorado e nunca sobe pro deploy) — quem administra o projeto na
+   Vercel precisa cadastrá-la manualmente em **Project Settings → Environment Variables**
+   como `GEMINI_API_KEY`, marcada para os ambientes Production e Preview. O `VERCEL.md`
+   tem o passo a passo completo (dashboard e CLI) e um checklist de deploy. Sem isso, as 5
+   funcionalidades de IA descritas abaixo simplesmente não funcionam no site publicado,
+   mesmo que o build passe normalmente (o erro só aparece em runtime, quando alguém tenta
+   usar o chat/assistente).
+4. Se em algum momento o deploy migrar para Cloudflare em vez de Vercel (o app usa
+   `nitro/vite`, que suporta os dois presets), a chave é configurada como secret com
+   `wrangler secret put GEMINI_API_KEY` em vez de variável de ambiente do dashboard.
 
 **Sobre a chave usada durante o desenvolvimento:** ela foi colada em texto puro no chat
 para configurar o projeto. Como qualquer chave que passe por um chat, ela deve ser tratada
