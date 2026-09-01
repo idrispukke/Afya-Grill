@@ -76,6 +76,7 @@ export function RevenueChart({ data }: { data: { dia: string; valor: number }[] 
               fill="var(--foreground)"
               fontSize={11}
               fontWeight={600}
+              style={{ paintOrder: "stroke", stroke: "var(--background)", strokeWidth: 3 }}
             />
           </Bar>
         </BarChart>
