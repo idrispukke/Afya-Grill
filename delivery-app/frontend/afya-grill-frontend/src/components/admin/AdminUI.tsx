@@ -35,21 +35,28 @@ export function PageHeader({
   title,
   subtitle,
   action,
+  eyebrow,
 }: {
   title: string;
   subtitle: string;
   action?: ReactNode;
+  eyebrow?: string;
 }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="mb-6 flex flex-wrap items-end justify-between gap-4"
+      className="mb-6 flex flex-wrap items-end justify-between gap-4 rounded-3xl border border-border/70 bg-card/90 p-5 shadow-soft sm:p-6"
     >
-      <div>
-        <h1 className="font-display text-3xl tracking-tight">{title}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+      <div className="max-w-2xl">
+        {eyebrow && (
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-primary/80">
+            {eyebrow}
+          </p>
+        )}
+        <h1 className="font-display text-3xl tracking-tight sm:text-4xl">{title}</h1>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground sm:text-[0.95rem]">{subtitle}</p>
       </div>
       {action}
     </motion.div>
@@ -73,8 +80,9 @@ export function Panel({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className={`rounded-2xl border border-border bg-card p-5 shadow-soft ${className}`}
+      className={`relative overflow-hidden rounded-3xl border border-border bg-card p-5 shadow-soft ${className}`}
     >
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent" />
       {title && (
         <header className="mb-4">
           <h2 className="font-display text-lg tracking-tight">{title}</h2>
@@ -148,18 +156,19 @@ export function StatCard({
       onViewportEnter={() => setInView(true)}
       transition={{ duration: 0.5, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -4 }}
-      className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-soft"
+      className="group relative overflow-hidden rounded-3xl border border-border bg-card p-5 shadow-soft"
     >
-      <div className="bg-glow pointer-events-none absolute -right-10 -top-14 h-32 w-32 opacity-60 transition-opacity duration-300 group-hover:opacity-100" />
-      <div className="flex items-center justify-between">
-        <span className="text-xs uppercase tracking-widest text-muted-foreground">{label}</span>
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">{label}</span>
         {icon && (
           <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-secondary text-primary transition-transform duration-300 group-hover:scale-110">
             {icon}
           </span>
         )}
       </div>
-      <p className="mt-3 whitespace-nowrap font-display text-2xl tabular-nums">{display}</p>
+      <p className="mt-3 whitespace-nowrap font-display text-3xl tracking-tight tabular-nums sm:text-[2rem]">
+        {display}
+      </p>
       {delta && (
         <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
           {trend === "up" && <TrendingUp className="h-3 w-3 text-primary" />}
@@ -168,10 +177,6 @@ export function StatCard({
           <span className={trend === "up" ? "text-primary" : undefined}>{delta}</span>
         </p>
       )}
-      <span
-        className="absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"
-        style={{ background: "var(--gradient-ember)" }}
-      />
     </motion.div>
   );
 }
@@ -199,7 +204,7 @@ export function LinkCard({
     >
       <a
         href={`#${id}`}
-        className="group flex items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary/40"
+        className="group flex items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:bg-accent/20"
       >
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-secondary text-primary transition-transform duration-300 group-hover:scale-110">
           {icon}
@@ -248,7 +253,7 @@ export function TableShell({ head, children }: { head: string[]; children: React
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-widest text-muted-foreground">
             {head.map((h) => (
-              <th key={h} className="px-3 pb-1 font-medium">
+              <th key={h} className="px-3 pb-2 font-medium">
                 {h}
               </th>
             ))}
@@ -266,7 +271,7 @@ export function Row({ children }: { children: ReactNode }) {
       initial={{ opacity: 0, x: -8 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.35 }}
-      className="group [&>td]:bg-surface [&>td]:transition-colors [&>td:first-child]:rounded-l-xl [&>td:last-child]:rounded-r-xl [&>td]:px-3 [&>td]:py-3 [&>td]:align-middle group-hover:[&>td]:bg-accent/50"
+      className="group [&>td]:bg-surface [&>td]:transition-colors [&>td:first-child]:rounded-l-xl [&>td:last-child]:rounded-r-xl [&>td]:px-3 [&>td]:py-3 [&>td]:align-middle group-hover:[&>td]:bg-accent/40"
     >
       {children}
     </motion.tr>
@@ -286,7 +291,7 @@ export function EmptyState({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="flex flex-col items-center justify-center gap-3 py-14 text-center"
+      className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border/70 bg-surface/40 py-14 text-center"
     >
       <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-muted-foreground">
         {icon}
@@ -316,7 +321,7 @@ export function ConfirmDialog({
 }) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="rounded-2xl border-border bg-card text-card-foreground">
+      <AlertDialogContent className="rounded-3xl border-border bg-card text-card-foreground shadow-soft">
         <AlertDialogHeader>
           <AlertDialogTitle className="font-display text-xl">{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
@@ -341,9 +346,9 @@ export function ActionButton({
   children,
   onClick,
   tone = "ghost",
-  type = "button",
-  "aria-label": ariaLabel,
-}: {
+      type = "button",
+      "aria-label": ariaLabel,
+    }: {
   children: ReactNode;
   onClick?: () => void;
   tone?: "ghost" | "primary" | "danger";
@@ -360,7 +365,7 @@ export function ActionButton({
       type={type}
       onClick={onClick}
       aria-label={ariaLabel}
-      className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all active:scale-95 ${tones[tone]}`}
+      className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 ${tones[tone]}`}
       style={tone === "primary" ? { background: "var(--gradient-ember)" } : undefined}
     >
       {children}
@@ -377,7 +382,7 @@ export function Field({
       <span className="mb-1.5 block text-muted-foreground">{label}</span>
       <input
         {...props}
-        className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-ring/30"
+        className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none transition-all placeholder:text-muted-foreground/70 focus:border-primary focus:ring-2 focus:ring-ring/30"
       />
     </label>
   );
@@ -445,7 +450,20 @@ export function AreaTrend({
             strokeWidth={2.5}
             fill="url(#areaTrendFill)"
             animationDuration={900}
-          />
+            dot={{ r: 3.5, strokeWidth: 0, fill: "var(--primary)" }}
+            activeDot={{ r: 5.5, strokeWidth: 0, fill: "var(--gold)" }}
+          >
+            <LabelList
+              dataKey={yKey}
+              position="top"
+              offset={8}
+              formatter={(v: number) => (formatter ? formatter(v) : String(v))}
+              fill="var(--foreground)"
+              fontSize={9}
+              fontWeight={600}
+              style={{ paintOrder: "stroke", stroke: "var(--background)", strokeWidth: 3 }}
+            />
+          </Area>
         </AreaChart>
       </ResponsiveContainer>
     </div>
@@ -478,6 +496,31 @@ export function DonutChart({
               paddingAngle={3}
               animationDuration={900}
               stroke="none"
+              labelLine={false}
+              label={({ cx, cy, midAngle, outerRadius, percent, index, name }) => {
+                const RADIAN = Math.PI / 180;
+                const radius = outerRadius + 16;
+                const x = Number(cx) + radius * Math.cos(-midAngle * RADIAN);
+                const y = Number(cy) + radius * Math.sin(-midAngle * RADIAN);
+                return (
+                  <text
+                    x={x}
+                    y={y}
+                    fill="var(--foreground)"
+                    textAnchor={x > Number(cx) ? "start" : "end"}
+                    dominantBaseline="central"
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 600,
+                      paintOrder: "stroke",
+                      stroke: "var(--background)",
+                      strokeWidth: 3,
+                    }}
+                  >
+                    {`${String(name)} ${Math.round(Number(percent) * 100)}%`}
+                  </text>
+                );
+              }}
             >
               {data.map((_, i) => (
                 <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
