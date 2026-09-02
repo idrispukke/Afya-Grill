@@ -286,47 +286,49 @@ export function PedidosSection() {
         </div>
 
         {view === "kanban" ? (
-          <div className="grid gap-4 xl:grid-cols-6">
-            {statusFlow.map((status) => {
-              const items = grouped[status];
-              const meta = columnMeta[status];
-              return (
-                <div
-                  key={status}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    if (draggingId) onDropToColumn(draggingId, status);
-                    setDraggingId(null);
-                  }}
-                  className={`min-h-[24rem] rounded-3xl border p-3 ${meta.accent}`}
-                >
-                  <div className="mb-3 flex items-center justify-between">
-                    <p className="text-sm font-medium">{status}</p>
-                    <Pill tone={meta.tone}>{items.length}</Pill>
-                  </div>
-
-                  <div className="space-y-3">
-                    {items.map((order) => (
-                      <OrderCard
-                        key={order.id}
-                        order={order}
-                        onAdvance={avancar}
-                        onCancel={setCancelId}
-                        onDragStart={() => setDraggingId(order.id)}
-                        onDragEnd={() => setDraggingId(null)}
-                      />
-                    ))}
-                  </div>
-
-                  {items.length === 0 && (
-                    <div className="mt-3 rounded-2xl border border-dashed border-border/70 bg-surface/50 p-5 text-center text-xs text-muted-foreground">
-                      Solte pedidos aqui
+          <div className="-mx-5 overflow-x-auto px-5 pb-2">
+            <div className="flex min-w-max gap-4">
+              {statusFlow.map((status) => {
+                const items = grouped[status];
+                const meta = columnMeta[status];
+                return (
+                  <div
+                    key={status}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (draggingId) onDropToColumn(draggingId, status);
+                      setDraggingId(null);
+                    }}
+                    className={`min-h-[24rem] w-64 shrink-0 rounded-3xl border p-3 sm:w-72 ${meta.accent}`}
+                  >
+                    <div className="mb-3 flex items-center justify-between">
+                      <p className="text-sm font-medium">{status}</p>
+                      <Pill tone={meta.tone}>{items.length}</Pill>
                     </div>
-                  )}
-                </div>
-              );
-            })}
+
+                    <div className="space-y-3">
+                      {items.map((order) => (
+                        <OrderCard
+                          key={order.id}
+                          order={order}
+                          onAdvance={avancar}
+                          onCancel={setCancelId}
+                          onDragStart={() => setDraggingId(order.id)}
+                          onDragEnd={() => setDraggingId(null)}
+                        />
+                      ))}
+                    </div>
+
+                    {items.length === 0 && (
+                      <div className="mt-3 rounded-2xl border border-dashed border-border/70 bg-surface/50 p-5 text-center text-xs text-muted-foreground">
+                        Solte pedidos aqui
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         ) : (
           <div className="space-y-3">
