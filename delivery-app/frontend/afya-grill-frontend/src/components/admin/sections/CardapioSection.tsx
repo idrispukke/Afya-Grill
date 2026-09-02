@@ -38,7 +38,7 @@ export function CardapioSection() {
     <section id="cardapio" className="mt-14 scroll-mt-24 border-t border-border/60 pt-14">
       <PageHeader
         title="Cardápio"
-        subtitle="Itens publicados nas casas parceiras."
+        subtitle="Itens publicados nas unidades."
         action={
           <ActionButton tone="primary" onClick={() => setOpen(true)}>
             <Plus className="h-3.5 w-3.5" /> Novo prato
@@ -130,7 +130,7 @@ export function CardapioSection() {
                 e.preventDefault();
                 addProduct({
                   nome,
-                  casa: "Brasa & Cia",
+                  casa: "Afya Grill Duque de Caxias",
                   categoria: "Principais",
                   preco: Number(preco) || 0,
                   estoque: 10,
@@ -168,7 +168,7 @@ export function CardapioSection() {
         open={!!removeId}
         onOpenChange={(v) => !v && setRemoveId(null)}
         title="Remover prato?"
-        description={`${removeAlvo?.nome ?? "Este item"} sai do cardápio e para de aparecer nas casas parceiras.`}
+        description={`${removeAlvo?.nome ?? "Este item"} sai do cardápio e para de aparecer nas unidades.`}
         confirmLabel="Remover"
         onConfirm={() => {
           if (removeId) {

@@ -41,8 +41,7 @@ export function DishCard({
       </div>
 
       <div className="p-6">
-        <p className="text-[11px] uppercase tracking-[0.28em] text-primary">{dish.house}</p>
-        <h3 className="mt-2 text-2xl">{dish.name}</h3>
+        <h3 className="text-2xl">{dish.name}</h3>
         <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{dish.description}</p>
 
         <div className="mt-5 flex items-center justify-between">

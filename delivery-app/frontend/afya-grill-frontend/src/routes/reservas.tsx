@@ -18,6 +18,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import logo from "@/assets/afya-grill-logo.png";
 import { Calendar } from "@/components/ui/calendar";
+import { ReservationAssistant, type ReservationParsed } from "@/components/ai/ReservationAssistant";
 import type { AdminReservation } from "@/data/admin";
 import { useAdmin } from "@/lib/admin";
 
@@ -131,6 +132,22 @@ function ReservasPage() {
     toast.success("Reserva enviada!");
   };
 
+  function handleParsed(parsed: ReservationParsed) {
+    if (parsed.casa) setCasa(parsed.casa);
+    if (parsed.data) setData(new Date(`${parsed.data}T00:00:00`));
+    if (parsed.hora) setHora(parsed.hora);
+    if (parsed.pessoas) setPessoas(parsed.pessoas);
+    if (parsed.nome) setNome(parsed.nome);
+    if (parsed.telefone) setTelefone(parsed.telefone);
+    if (parsed.observacao) setObservacao(parsed.observacao);
+
+    const casaOk = parsed.casa ?? casa;
+    const dataOk = parsed.data ?? (data ? isoDate(data) : null);
+    const horaOk = parsed.hora ?? hora;
+    if (casaOk && dataOk && horaOk) setStep(3);
+    else if (casaOk) setStep(2);
+  }
+
   return (
     <div className="min-h-screen pb-24">
       <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-xl">
@@ -151,12 +168,24 @@ function ReservasPage() {
       <main className="relative mx-auto max-w-3xl px-4 pt-8">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-glow opacity-40" />
 
-        <Link
-          to="/"
-          className="relative inline-flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" /> Voltar ao site
-        </Link>
+        <div className="relative flex flex-wrap items-center gap-4">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> Voltar ao site
+          </Link>
+
+          {!confirmada && (
+            <motion.span
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 text-xs uppercase tracking-[0.28em]"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-primary" /> reserva de mesa
+            </motion.span>
+          )}
+        </div>
 
         {confirmada ? (
           <motion.div
@@ -229,13 +258,6 @@ function ReservasPage() {
           </motion.div>
         ) : (
           <>
-            <motion.span
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="relative mt-5 inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 text-xs uppercase tracking-[0.28em]"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-primary" /> reserva de mesa
-            </motion.span>
             <h1 className="relative mt-5 text-4xl sm:text-5xl">
               Sua mesa <span className="text-gradient">te espera</span>
             </h1>
@@ -244,6 +266,13 @@ function ReservasPage() {
             </p>
 
             <Stepper step={step} />
+
+            {filiaisAtivas.length > 0 && (
+              <ReservationAssistant
+                casas={filiaisAtivas.map((h) => h.nome)}
+                onParsed={handleParsed}
+              />
+            )}
 
             <div className="relative mt-8 min-h-[360px]">
               <AnimatePresence mode="wait">

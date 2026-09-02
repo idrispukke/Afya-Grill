@@ -6,7 +6,7 @@ import { useAdmin } from "@/lib/admin";
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Painel gerencial — Afya Grill" },
+      { title: "Painel gerencial - Afya Grill" },
       {
         name: "description",
         content: "Painel interno da Afya Grill: pedidos, cardápio, casas, entregas e financeiro.",

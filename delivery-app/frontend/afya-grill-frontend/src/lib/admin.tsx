@@ -30,14 +30,34 @@ import {
   type AdminReview,
   type AdminStaff,
   type AdminTable,
+  type OrderChannel,
+  type OrderItemLine,
   type OrderStatus,
   type ReservationStatus,
 } from "@/data/admin";
+import { generateOrderId, nowMs, pickEtaMs, timeLabel } from "@/lib/orders";
+import { useSyncedState } from "@/lib/sync-storage";
 
 const SESSION_KEY = "afya-admin-session-v1";
+const ORDERS_KEY = "afya-orders-v1";
+const COURIERS_KEY = "afya-couriers-v1";
 
 export const ADMIN_EMAIL = "admin@afyagrill.com";
 export const ADMIN_PASSWORD = "afya130299J@";
+
+export type NewOrderInput = {
+  channel: OrderChannel;
+  cliente: string;
+  telefone?: string | undefined;
+  casa: string;
+  unidadeId?: string | undefined;
+  pagamento: AdminOrder["pagamento"];
+  itens: OrderItemLine[];
+  total: number;
+  mesa?: number | undefined;
+  endereco?: string | undefined;
+  destino?: { lat: number; lng: number } | undefined;
+};
 
 type AdminCtx = {
   ready: boolean;
@@ -47,6 +67,12 @@ type AdminCtx = {
 
   orders: AdminOrder[];
   setOrderStatus: (id: string, status: OrderStatus) => void;
+  createOrder: (input: NewOrderInput) => AdminOrder;
+  startPreparing: (id: string) => void;
+  markReady: (id: string) => void;
+  deliverToTable: (id: string) => void;
+  acceptDelivery: (id: string, courierId: string) => void;
+  markDelivered: (id: string) => void;
 
   products: AdminProduct[];
   toggleProduct: (id: string) => void;
@@ -89,15 +115,19 @@ const Ctx = createContext<AdminCtx | null>(null);
 
 const courierFlow: AdminCourier["status"][] = ["Disponível", "Em rota", "Offline"];
 
+function withHistory(order: AdminOrder, status: OrderStatus): AdminOrder {
+  return { ...order, status, historico: [...order.historico, { status, em: nowMs() }] };
+}
+
 export function AdminProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [user, setUser] = useState<string | null>(null);
 
-  const [orders, setOrders] = useState(seedOrders);
+  const [orders, setOrders] = useSyncedState<AdminOrder[]>(ORDERS_KEY, seedOrders);
+  const [couriers, setCouriers] = useSyncedState<AdminCourier[]>(COURIERS_KEY, seedCouriers);
   const [products, setProducts] = useState(seedProducts);
   const [houses, setHouses] = useState(seedHouses);
   const [customers, setCustomers] = useState(seedCustomers);
-  const [couriers, setCouriers] = useState(seedCouriers);
   const [coupons, setCoupons] = useState(seedCoupons);
   const [reviews, setReviews] = useState(seedReviews);
   const [staff, setStaff] = useState(seedStaff);
@@ -146,9 +176,98 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       user,
       signIn,
       signOut,
+
       orders,
       setOrderStatus: (id, status) =>
-        setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o))),
+        setOrders((prev) => prev.map((o) => (o.id === id ? withHistory(o, status) : o))),
+
+      createOrder: (input) => {
+        const id = generateOrderId();
+        const criadoEmMs = nowMs();
+        const order: AdminOrder = {
+          id,
+          cliente: input.cliente,
+          telefone: input.telefone,
+          casa: input.casa,
+          unidadeId: input.unidadeId,
+          itens: input.itens.map((i) => `${i.qtd}x ${i.nome}`).join(", "),
+          itensDetalhados: input.itens,
+          total: input.total,
+          pagamento: input.pagamento,
+          status: "Novo",
+          criadoEm: timeLabel(criadoEmMs),
+          criadoEmMs,
+          entregador: "",
+          channel: input.channel,
+          mesa: input.mesa,
+          endereco: input.endereco,
+          destino: input.destino,
+          historico: [{ status: "Novo", em: criadoEmMs }],
+        };
+        setOrders((prev) => [order, ...prev]);
+        return order;
+      },
+
+      startPreparing: (id) =>
+        setOrders((prev) =>
+          prev.map((o) => (o.id === id && o.status === "Novo" ? withHistory(o, "Em preparo") : o)),
+        ),
+
+      markReady: (id) =>
+        setOrders((prev) =>
+          prev.map((o) =>
+            o.id === id && o.status === "Em preparo" ? withHistory(o, "Pronto") : o,
+          ),
+        ),
+
+      deliverToTable: (id) =>
+        setOrders((prev) =>
+          prev.map((o) =>
+            o.id === id && o.channel === "mesa" && o.status === "Pronto"
+              ? withHistory(o, "Entregue")
+              : o,
+          ),
+        ),
+
+      acceptDelivery: (id, courierId) => {
+        const courier = couriers.find((c) => c.id === courierId);
+        if (!courier) return;
+        const aceitoEmMs = nowMs();
+        const etaMs = pickEtaMs();
+        setOrders((prev) =>
+          prev.map((o) =>
+            o.id === id && o.channel === "delivery" && o.status === "Pronto"
+              ? {
+                  ...withHistory(o, "A caminho"),
+                  entregador: courier.nome,
+                  entregadorId: courier.id,
+                  aceitoEmMs,
+                  etaMs,
+                }
+              : o,
+          ),
+        );
+        setCouriers((prev) =>
+          prev.map((c) => (c.id === courierId ? { ...c, status: "Em rota" } : c)),
+        );
+      },
+
+      markDelivered: (id) => {
+        setOrders((prev) => {
+          const order = prev.find((o) => o.id === id);
+          if (order?.entregadorId) {
+            setCouriers((prevCouriers) =>
+              prevCouriers.map((c) =>
+                c.id === order.entregadorId
+                  ? { ...c, status: "Disponível", entregasHoje: c.entregasHoje + 1 }
+                  : c,
+              ),
+            );
+          }
+          return prev.map((o) => (o.id === id ? withHistory(o, "Entregue") : o));
+        });
+      },
+
       products,
       toggleProduct: (id) =>
         setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, ativo: !p.ativo } : p))),
@@ -211,10 +330,12 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       signIn,
       signOut,
       orders,
+      setOrders,
+      couriers,
+      setCouriers,
       products,
       houses,
       customers,
-      couriers,
       coupons,
       reviews,
       staff,

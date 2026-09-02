@@ -1,7 +1,3 @@
-/C:/Users/Rzd021/Documents/Codex/2026-08-17/server-localhost-sqlexpress-database-master-trusted.env.example
-
-
-
 from __future__ import annotations
 
 import json
@@ -13,7 +9,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parent
 
 
 def load_dotenv() -> None:
@@ -21,7 +17,6 @@ def load_dotenv() -> None:
     env_file = PROJECT_ROOT / ".env"
     if not env_file.exists():
         return
-
     for raw_line in env_file.read_text(encoding="utf-8").splitlines():
         line = raw_line.strip()
         if not line or line.startswith("#") or "=" not in line:
@@ -32,7 +27,6 @@ def load_dotenv() -> None:
 
 
 load_dotenv()
-
 SUPABASE_URL = os.getenv("SUPABASE_URL", "").rstrip("/")
 # SUPABASE_SECRET_KEY e o formato atual de chave do Supabase.
 # SUPABASE_SERVICE_ROLE_KEY continua sendo aceito para projetos antigos.
@@ -40,7 +34,6 @@ SUPABASE_SERVICE_ROLE_KEY = (
     os.getenv("SUPABASE_SECRET_KEY", "")
     or os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
 )
-
 if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
     raise SystemExit(
         "Defina SUPABASE_URL e SUPABASE_SECRET_KEY no arquivo .env. "
@@ -63,7 +56,6 @@ def supabase_request(
     }
     if prefer:
         headers["Prefer"] = prefer
-
     body = json.dumps(data).encode("utf-8") if data is not None else None
     request = Request(
         f"{SUPABASE_URL}/rest/v1/{path}",
@@ -71,7 +63,6 @@ def supabase_request(
         headers=headers,
         method=method,
     )
-
     try:
         with urlopen(request, timeout=30) as response:
             content = response.read().decode("utf-8")
@@ -113,7 +104,6 @@ def ensure_record(
 
 def seed() -> None:
     print("Criando dados de exemplo...")
-
     centro = ensure_record(
         "localidades",
         {
@@ -136,7 +126,6 @@ def seed() -> None:
         },
         ("nome",),
     )
-
     sabor = ensure_record(
         "restaurantes",
         {
@@ -164,7 +153,6 @@ def seed() -> None:
         },
         ("nome",),
     )
-
     sabor_centro = ensure_record(
         "restaurante_localidades",
         {"restaurante_id": sabor["id"], "localidade_id": centro["id"], "ativo": True},
@@ -185,7 +173,6 @@ def seed() -> None:
         {"restaurante_id": burger["id"], "localidade_id": norte["id"], "ativo": True},
         ("restaurante_id", "localidade_id"),
     )
-
     menus: dict[int, list[dict[str, Any]]] = {
         sabor_centro["id"]: [
             {"nome": "Prato Executivo", "descricao": "Arroz, feijao, salada e proteina.", "categoria": "Pratos", "preco": 29.90},
@@ -204,7 +191,6 @@ def seed() -> None:
             {"nome": "Batata Frita", "descricao": "Porcao media.", "categoria": "Acompanhamentos", "preco": 12.00},
         ],
     }
-
     for restaurante_localidade_id, items in menus.items():
         for item in items:
             ensure_record(
@@ -216,7 +202,6 @@ def seed() -> None:
                 },
                 ("restaurante_localidade_id", "nome"),
             )
-
     for restaurante_localidade in (sabor_centro, sabor_norte, pizza_centro, burger_norte):
         for numero in range(1, 6):
             ensure_record(
@@ -228,7 +213,6 @@ def seed() -> None:
                 },
                 ("restaurante_localidade_id", "numero"),
             )
-
     for entregador in (
         {"nome": "Ana Souza", "telefone": "11999990001", "ativo": True},
         {"nome": "Carlos Lima", "telefone": "11999990002", "ativo": True},

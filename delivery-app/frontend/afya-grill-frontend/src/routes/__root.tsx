@@ -8,11 +8,13 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 import appCss from "../styles.css?url";
 import { CartProvider } from "@/lib/cart";
 import { AdminProvider } from "@/lib/admin";
 import { Toaster } from "@/components/ui/sonner";
+import { ChatWidget } from "@/components/ai/ChatWidget";
 
 function NotFoundComponent() {
   return (
@@ -120,6 +122,7 @@ function RootShell({ children }: { children: ReactNode }) {
       <body>
         {children}
         <Scripts />
+        <Analytics />
       </body>
     </html>
   );
@@ -134,6 +137,7 @@ function RootComponent() {
         <AdminProvider>
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
+          <ChatWidget />
           <Toaster position="top-center" />
         </AdminProvider>
       </CartProvider>

@@ -15,7 +15,7 @@ import {
   Star,
   Utensils,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import heroImg from "@/assets/hero.jpg";
 import { Loader } from "@/components/Loader";
@@ -23,21 +23,25 @@ import { Navbar } from "@/components/Navbar";
 import { Reveal } from "@/components/Reveal";
 import { DishCard } from "@/components/DishCard";
 import { DishModal } from "@/components/DishModal";
+import { UnitMapModal } from "@/components/UnitMapModal";
 import { categories, dishes, type Dish } from "@/data/menu";
+import { units, type Unit } from "@/data/units";
+import { siteOrigin } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Afya Grill — plataforma das melhores cozinhas" },
+      { title: "Afya Grill — nosso restaurante, várias unidades" },
       {
         name: "description",
         content:
-          "Curadoria de restaurantes autorais em um só lugar: peça em segundos, acompanhe o preparo e receba quente. Cardápio, casas parceiras e entrega premium.",
+          "Afya Grill é um restaurante só, com unidades pela Zona Sul do Rio e em Duque de Caxias: peça em segundos, acompanhe o preparo e receba quente.",
       },
-      { property: "og:title", content: "Afya Grill — plataforma das melhores cozinhas" },
+      { property: "og:title", content: "Afya Grill — nosso restaurante, várias unidades" },
       {
         property: "og:description",
-        content: "Curadoria de restaurantes autorais, pedido em segundos e entrega impecável.",
+        content:
+          "O mesmo padrão Afya Grill em cada unidade, pedido em segundos e entrega impecável.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -47,7 +51,7 @@ export const Route = createFileRoute("/")({
 });
 
 const stats = [
-  { value: "320+", label: "cozinhas curadas" },
+  { value: "6", label: "unidades no Rio e em Caxias" },
   { value: "28 min", label: "entrega média" },
   { value: "4.9", label: "nota dos clientes" },
   { value: "1.2M", label: "pedidos servidos" },
@@ -56,8 +60,8 @@ const stats = [
 const steps = [
   {
     icon: Search,
-    title: "Escolha a casa",
-    text: "Curadoria feita por chefs: só entra restaurante que passa na nossa prova de fogo.",
+    title: "Escolha a unidade",
+    text: "Todas as unidades seguem o mesmo padrão Afya Grill de qualidade, direto da nossa cozinha.",
   },
   {
     icon: Utensils,
@@ -76,40 +80,40 @@ const steps = [
   },
 ];
 
-const houses = [
-  { name: "Brasa & Cia", type: "Steakhouse", rating: "4.9", time: "25 min" },
-  { name: "Osteria Lunare", type: "Italiana", rating: "4.8", time: "35 min" },
-  { name: "Kaze Sushi Bar", type: "Japonesa", rating: "5.0", time: "40 min" },
-  { name: "Forno Sette", type: "Pizzaria", rating: "4.7", time: "30 min" },
-  { name: "Doce Atelier", type: "Confeitaria", rating: "4.9", time: "20 min" },
-  { name: "Bar Ébano", type: "Coquetelaria", rating: "4.8", time: "15 min" },
-];
-
 const testimonials = [
   {
     name: "Marina Alves",
-    role: "Assinante Prime",
-    text: "É a única plataforma onde o prato chega igual ao que eu comeria no salão. O tagliatelle veio perfeito.",
+    role: "Cliente Copacabana",
+    text: "É a única entrega onde o prato chega igual ao que eu comeria no salão. Sempre no ponto.",
   },
   {
     name: "Rafael Duarte",
     role: "Pedidos semanais",
-    text: "A curadoria salva. Nunca mais precisei rolar 200 restaurantes ruins pra achar um bom jantar.",
+    text: "Não importa qual unidade eu peço, o padrão é sempre o mesmo. Nunca teve pedido errado.",
   },
   {
     name: "Chef Lia Prado",
-    role: "Osteria Lunare",
-    text: "Como restaurante parceiro, o fluxo de comandas é o mais organizado que já usei. Zero pedido perdido.",
+    role: "Cozinha Afya Grill Botafogo",
+    text: "O fluxo de comandas é o mais organizado que já trabalhei. Zero pedido perdido.",
   },
 ];
 
 function Home() {
   const [active, setActive] = useState<(typeof categories)[number]>("Todos");
   const [selected, setSelected] = useState<Dish | null>(null);
+  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const imgY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const fade = useTransform(scrollYProgress, [0, 1], [1, 0]);
+
+  // O valor do QR Code depende de window.location.origin, que difere entre o
+  // HTML renderizado no servidor (fallback fixo) e o navegador — calcular só
+  // depois de montar evita o mismatch de hydration no SVG gerado.
+  const [qrOrigin, setQrOrigin] = useState<string | null>(null);
+  useEffect(() => {
+    setQrOrigin(siteOrigin());
+  }, []);
 
   const list = active === "Todos" ? dishes : dishes.filter((d) => d.category === active);
 
@@ -162,8 +166,8 @@ function Home() {
             transition={{ delay: 2.45, duration: 0.8 }}
             className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg"
           >
-            Afya Grill reúne as cozinhas autorais mais desejadas em uma só plataforma. Pedido em
-            segundos, preparo acompanhado ao vivo e entrega no ponto exato.
+            Afya Grill é o nosso restaurante, com unidades pela Zona Sul do Rio e em Duque de
+            Caxias. Pedido em segundos, preparo acompanhado ao vivo e entrega no ponto exato.
           </motion.p>
 
           <motion.div
@@ -219,9 +223,9 @@ function Home() {
         <div className="flex w-max animate-marquee gap-10 whitespace-nowrap">
           {Array.from({ length: 2 }).map((_, r) => (
             <div key={r} className="flex gap-10">
-              {houses.map((h) => (
-                <span key={`${r}-${h.name}`} className="font-display text-xl text-muted-foreground">
-                  {h.name} <span className="text-primary">•</span>
+              {units.map((u) => (
+                <span key={`${r}-${u.id}`} className="font-display text-xl text-muted-foreground">
+                  {u.name} <span className="text-primary">•</span>
                 </span>
               ))}
             </div>
@@ -272,36 +276,55 @@ function Home() {
         </motion.div>
       </section>
 
-      {/* CASAS */}
-      <section id="casas" className="scroll-mt-24 border-y border-border bg-surface/40 py-28">
+      {/* UNIDADES */}
+      <section id="unidades" className="scroll-mt-24 border-y border-border bg-surface/40 py-28">
         <div className="mx-auto max-w-6xl px-4">
           <Reveal>
-            <p className="text-xs uppercase tracking-[0.35em] text-primary">casas parceiras</p>
+            <p className="text-xs uppercase tracking-[0.35em] text-primary">nossas unidades</p>
             <h2 className="mt-4 max-w-2xl text-4xl sm:text-5xl">
-              Curadoria fechada. <span className="text-gradient">Nada genérico.</span>
+              O mesmo padrão Afya Grill. <span className="text-gradient">Em cada endereço.</span>
             </h2>
           </Reveal>
 
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {houses.map((h, i) => (
-              <Reveal key={h.name} delay={i * 0.05}>
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {units.map((u, i) => (
+              <Reveal key={u.id} delay={i * 0.05}>
                 <motion.div
                   whileHover={{ y: -6 }}
-                  className="group relative overflow-hidden rounded-2xl border border-border bg-surface p-6 transition-colors hover:border-primary/60"
+                  className="group relative overflow-hidden rounded-2xl border border-border bg-surface shadow-soft transition-colors hover:border-primary/60"
                 >
                   <div className="absolute inset-x-0 -top-px h-px overflow-hidden">
                     <span className="absolute inset-y-0 w-1/3 animate-shimmer bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 group-hover:opacity-100" />
                   </div>
-                  <p className="font-display text-2xl">{h.name}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{h.type}</p>
-                  <div className="mt-5 flex items-center gap-4 text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1">
-                      <Star className="h-3 w-3 fill-gold text-gold" /> {h.rating}
+
+                  <button onClick={() => setSelectedUnit(u)} className="block w-full p-6 text-left">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-[10px] uppercase tracking-widest text-muted-foreground">
+                      {u.especialidade}
                     </span>
-                    <span className="inline-flex items-center gap-1">
-                      <Clock className="h-3 w-3" /> {h.time}
-                    </span>
-                  </div>
+                    <p className="mt-3 font-display text-2xl">{u.name}</p>
+                    <p className="mt-1.5 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" /> {u.bairro},{" "}
+                      {u.cidade}
+                    </p>
+                    <div className="mt-5 flex items-center gap-4 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1">
+                        <Star className="h-3 w-3 fill-gold text-gold" /> {u.rating}
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <Clock className="h-3 w-3" /> {u.time}
+                      </span>
+                      <span className="ml-auto text-primary underline-offset-4 group-hover:underline">
+                        Ver no mapa
+                      </span>
+                    </div>
+                  </button>
+
+                  <a
+                    href={`tel:+55${u.telefone.replace(/\D/g, "")}`}
+                    className="flex items-center gap-2 border-t border-border px-6 py-3.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                  >
+                    <Phone className="h-3.5 w-3.5 shrink-0 text-primary" /> {u.telefone}
+                  </a>
                 </motion.div>
               </Reveal>
             ))}
@@ -382,8 +405,9 @@ function Home() {
               Escaneie o QR Code <span className="text-gradient">e peça na hora</span>
             </h2>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">
-              Cada mesa das casas parceiras tem o próprio QR Code. Aponte a câmera, veja o cardápio
-              completo, chame o garçom ou peça a conta — sem esperar ninguém passar na mesa.
+              Cada mesa, em qualquer unidade, tem o próprio QR Code. Aponte a câmera, veja o
+              cardápio completo, chame o garçom ou peça a conta — sem esperar ninguém passar na
+              mesa.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -410,15 +434,17 @@ function Home() {
                 className="relative mt-3 flex flex-col items-center gap-5 rounded-[2rem] border border-border bg-surface p-8 shadow-ember"
               >
                 <span className="absolute -top-3 left-1/2 w-max -translate-x-1/2 whitespace-nowrap rounded-full glass px-4 py-1 text-[11px] uppercase tracking-widest">
-                  Mesa 12 · Brasa & Cia
+                  Mesa 12 · Afya Grill Duque de Caxias
                 </span>
-                <div className="rounded-2xl bg-white p-3">
-                  <QRCodeSVG
-                    value="https://afyagrill.com.br/cardapio?casa=brasa-cia&mesa=12"
-                    size={168}
-                    level="M"
-                    fgColor="#1a1108"
-                  />
+                <div className="flex h-[168px] w-[168px] items-center justify-center rounded-2xl bg-white p-3">
+                  {qrOrigin && (
+                    <QRCodeSVG
+                      value={`${qrOrigin}/cardapio?casa=duque-de-caxias&mesa=12`}
+                      size={168}
+                      level="M"
+                      fgColor="#1a1108"
+                    />
+                  )}
                 </div>
                 <p className="text-center text-xs text-muted-foreground">
                   Aponte a câmera do celular para o código
@@ -507,17 +533,29 @@ function Home() {
               Afya<span className="text-gradient"> Grill</span>
             </p>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              Plataforma de restaurantes com curadoria de chefs. Do bistrô de bairro à alta
-              gastronomia, tudo em um só lugar.
+              Nosso restaurante, com o mesmo padrão de qualidade em cada unidade — da Zona Sul do
+              Rio a Duque de Caxias.
             </p>
             <div className="mt-6 flex gap-3">
-              {[Instagram, Mail, Phone].map((Icon, i) => (
-                <span
-                  key={i}
+              {[
+                {
+                  Icon: Instagram,
+                  href: "https://www.instagram.com/afyagrill",
+                  label: "Instagram",
+                },
+                { Icon: Mail, href: "mailto:ola@afyagrill.com.br", label: "E-mail" },
+                { Icon: Phone, href: "tel:+552140028922", label: "Telefone" },
+              ].map(({ Icon, href, label }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target={href.startsWith("http") ? "_blank" : undefined}
+                  rel={href.startsWith("http") ? "noreferrer" : undefined}
+                  aria-label={label}
                   className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border transition-colors hover:border-primary hover:text-primary"
                 >
                   <Icon className="h-4 w-4" />
-                </span>
+                </a>
               ))}
             </div>
           </Reveal>
@@ -579,6 +617,7 @@ function Home() {
       </footer>
 
       <DishModal dish={selected} onClose={() => setSelected(null)} />
+      <UnitMapModal unit={selectedUnit} onClose={() => setSelectedUnit(null)} />
     </div>
   );
 }

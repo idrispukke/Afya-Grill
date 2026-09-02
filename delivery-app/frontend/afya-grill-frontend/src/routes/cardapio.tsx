@@ -4,10 +4,13 @@ import {
   ArrowLeft,
   Bell,
   CalendarCheck2,
+  Loader2,
   Receipt,
   Search,
   ShoppingBag,
   Sparkles,
+  Wand2,
+  X,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -15,9 +18,13 @@ import { z } from "zod";
 import logo from "@/assets/afya-grill-logo.png";
 import { DishCard } from "@/components/DishCard";
 import { DishModal } from "@/components/DishModal";
+import { OrderAssistant } from "@/components/ai/OrderAssistant";
 import { categories, dishes, type Dish } from "@/data/menu";
+import { units } from "@/data/units";
+import { aiSemanticSearch } from "@/lib/ai";
 import { useCart } from "@/lib/cart";
-import { slugify } from "@/lib/utils";
+import { searchDishes } from "@/lib/dishSearch";
+import { useAiRace } from "@/lib/useAiRace";
 
 const searchSchema = z.object({
   casa: z.string().optional(),
@@ -44,19 +51,42 @@ function CardapioDigital() {
   const [active, setActive] = useState<(typeof categories)[number]>("Todos");
   const [busca, setBusca] = useState("");
   const [selected, setSelected] = useState<Dish | null>(null);
+  const [aiOrder, setAiOrder] = useState<string[] | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const race = useAiRace();
 
+  function buscaInteligente() {
+    if (!busca.trim() || aiLoading) return;
+    setAiLoading(true);
+    const q = busca;
+    // Se o Gemini demorar mais que ~2,5s, usa a busca local por palavras-chave nesse
+    // meio-tempo, e troca pelo resultado da IA se ele chegar em seguida.
+    race(
+      () => aiSemanticSearch({ data: { query: q } }).then((r) => r.itemIds),
+      () => searchDishes(q, dishes.length).map((d) => d.id),
+      (itemIds) => {
+        setAiOrder(itemIds);
+        setAiLoading(false);
+      },
+    );
+  }
+
+  // O cardápio é o mesmo em todas as unidades hoje; o "casa" na URL só
+  // identifica qual unidade aparece no cabeçalho (vindo do QR Code da mesa).
   const casaNome = useMemo(() => {
     if (!casa) return null;
-    const match = dishes.find((d) => slugify(d.house) === casa);
-    return match?.house ?? casa;
+    return units.find((u) => u.id === casa)?.name ?? null;
   }, [casa]);
 
-  const list = dishes.filter(
-    (d) =>
-      (active === "Todos" || d.category === active) &&
-      (!casaNome || d.house === casaNome) &&
-      (d.name + d.house).toLowerCase().includes(busca.toLowerCase()),
-  );
+  const list = aiOrder
+    ? aiOrder
+        .map((id) => dishes.find((d) => d.id === id))
+        .filter((d): d is Dish => d !== undefined && (active === "Todos" || d.category === active))
+    : dishes.filter(
+        (d) =>
+          (active === "Todos" || d.category === active) &&
+          d.name.toLowerCase().includes(busca.toLowerCase()),
+      );
 
   return (
     <div className="min-h-screen pb-28">
@@ -77,6 +107,7 @@ function CardapioDigital() {
             </Link>
             <Link
               to="/carrinho"
+              search={{ casa, mesa }}
               className="relative inline-flex items-center gap-2 rounded-xl bg-secondary px-4 py-2 text-sm font-medium transition-colors hover:bg-accent"
             >
               <ShoppingBag className="h-4 w-4" />
@@ -103,14 +134,27 @@ function CardapioDigital() {
       <main className="relative mx-auto max-w-5xl px-4 pt-8">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-glow opacity-40" />
 
-        <Link
-          to="/"
-          className="relative inline-flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" /> Voltar ao site
-        </Link>
+        <div className="relative flex flex-wrap items-center gap-4">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> Voltar ao site
+          </Link>
 
-        {mesa ? (
+          {!mesa && (
+            <motion.span
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 text-xs uppercase tracking-[0.28em]"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-primary" />{" "}
+              {casaNome ? casaNome : "cardápio digital"}
+            </motion.span>
+          )}
+        </div>
+
+        {mesa && (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -148,15 +192,6 @@ function CardapioDigital() {
               </button>
             </div>
           </motion.div>
-        ) : (
-          <motion.span
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative mt-5 inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 text-xs uppercase tracking-[0.28em]"
-          >
-            <Sparkles className="h-3.5 w-3.5 text-primary" />{" "}
-            {casaNome ? casaNome : "cardápio digital"}
-          </motion.span>
         )}
 
         <h1 className="relative mt-5 text-4xl sm:text-5xl">
@@ -170,10 +205,36 @@ function CardapioDigital() {
           <Search className="h-4 w-4 text-muted-foreground" />
           <input
             value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            placeholder="Buscar prato ou casa"
+            onChange={(e) => {
+              setBusca(e.target.value);
+              setAiOrder(null);
+            }}
+            onKeyDown={(e) => e.key === "Enter" && void buscaInteligente()}
+            placeholder="Buscar prato, ou descreva o que quer (ex: algo leve, sem glúten)"
             className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
+          {aiOrder ? (
+            <button
+              onClick={() => setAiOrder(null)}
+              className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-secondary px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <X className="h-3 w-3" /> limpar
+            </button>
+          ) : (
+            <button
+              onClick={() => void buscaInteligente()}
+              disabled={!busca.trim() || aiLoading}
+              aria-label="Busca inteligente com IA"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-secondary px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+            >
+              {aiLoading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Wand2 className="h-3.5 w-3.5" />
+              )}
+              <span className="hidden sm:inline">Busca IA</span>
+            </button>
+          )}
         </div>
 
         <div className="relative mt-4 flex flex-wrap gap-2">
@@ -215,6 +276,8 @@ function CardapioDigital() {
 
       <DishModal dish={selected} onClose={() => setSelected(null)} />
 
+      <OrderAssistant />
+
       <AnimatePresence>
         {count > 0 && (
           <motion.div
@@ -226,6 +289,7 @@ function CardapioDigital() {
           >
             <Link
               to="/carrinho"
+              search={{ casa, mesa }}
               className="mx-auto flex max-w-5xl items-center justify-between rounded-2xl px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-ember"
               style={{ background: "var(--gradient-ember)" }}
             >
