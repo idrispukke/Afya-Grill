@@ -125,9 +125,10 @@ function CartPage() {
   }
 
   useEffect(() => {
+    if (isMesa) return;
     setPixCode((prev) => prev ?? gerarCodigoPix(total));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isMesa]);
 
   function selecionarPagamento(metodo: MetodoPagamento) {
     setPagamento(metodo);
@@ -151,8 +152,11 @@ function CartPage() {
           telefone: form.telefone.trim().length < 8,
           endereco: form.endereco.trim().length === 0,
         };
+    // Pedido de mesa não escolhe forma de pagamento agora (isso é resolvido depois, na
+    // conta, com o garçom) — só o cartão de crédito/débito precisa de validação, e nem
+    // aparece na tela pra mesa.
     const cErrors: Partial<Record<keyof CartaoForm, boolean>> =
-      pagamento === "pix"
+      isMesa || pagamento === "pix"
         ? {}
         : {
             numero: cartao.numero.replace(/\D/g, "").length < 16,
@@ -166,14 +170,15 @@ function CartPage() {
       setCartaoErrors(cErrors);
       toast.error(
         isMesa
-          ? "Confirma seu nome e a forma de pagamento antes de finalizar"
+          ? "Confirma seu nome antes de enviar o pedido"
           : "Confirma a unidade, seus dados e a forma de pagamento antes de finalizar",
       );
       return;
     }
 
-    const pagamentoLabel =
-      pagamento === "pix"
+    const pagamentoLabel = isMesa
+      ? "Conta da mesa"
+      : pagamento === "pix"
         ? "Pix"
         : pagamento === "credito"
           ? "Cartão de crédito"
@@ -193,7 +198,9 @@ function CartPage() {
       telefone: form.telefone.trim() || undefined,
       casa: casaFinal,
       unidadeId: unidadeIdFinal,
-      pagamento: pagamento === "pix" ? "Pix" : "Cartão",
+      // Mesa fecha a conta depois com o garçom — "Dinheiro" aqui só sinaliza pro time
+      // que ainda não foi pago pelo app, não que o cliente vai pagar em espécie.
+      pagamento: isMesa ? "Dinheiro" : pagamento === "pix" ? "Pix" : "Cartão",
       itens: items.map((i) => ({ nome: i.name, qtd: i.qty, preco: i.price })),
       total,
       mesa: isMesa ? Number(mesa) : undefined,
@@ -225,12 +232,22 @@ function CartPage() {
       <div className="pointer-events-none fixed inset-x-0 top-0 h-[420px] bg-glow opacity-60" />
 
       <main className="relative mx-auto max-w-6xl px-4 pb-24 pt-32">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" /> Continuar escolhendo
-        </Link>
+        {isMesa ? (
+          <Link
+            to="/cardapio"
+            search={{ casa, mesa }}
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" /> Pedir mais alguma coisa
+          </Link>
+        ) : (
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" /> Continuar escolhendo
+          </Link>
+        )}
 
         <h1 className="mt-6 text-4xl sm:text-5xl">
           Seu <span className="text-gradient">carrinho</span>
@@ -249,13 +266,24 @@ function CartPage() {
             <p className="mt-2 text-sm text-muted-foreground">
               Escolha um prato no cardápio e ele aparece aqui na hora.
             </p>
-            <Link
-              to="/"
-              className="mt-6 inline-block rounded-xl px-6 py-3 text-sm font-semibold text-primary-foreground shadow-ember transition-transform hover:scale-105"
-              style={{ background: "var(--gradient-ember)" }}
-            >
-              Ver cardápio
-            </Link>
+            {isMesa ? (
+              <Link
+                to="/cardapio"
+                search={{ casa, mesa }}
+                className="mt-6 inline-block rounded-xl px-6 py-3 text-sm font-semibold text-primary-foreground shadow-ember transition-transform hover:scale-105"
+                style={{ background: "var(--gradient-ember)" }}
+              >
+                Ver cardápio
+              </Link>
+            ) : (
+              <Link
+                to="/"
+                className="mt-6 inline-block rounded-xl px-6 py-3 text-sm font-semibold text-primary-foreground shadow-ember transition-transform hover:scale-105"
+                style={{ background: "var(--gradient-ember)" }}
+              >
+                Ver cardápio
+              </Link>
+            )}
           </motion.div>
         ) : (
           <div className="mt-10 grid gap-8 lg:grid-cols-[1.6fr_1fr]">
@@ -357,7 +385,8 @@ function CartPage() {
                     <div>
                       <p className="font-display text-lg leading-tight">Mesa {mesa}</p>
                       <p className="text-xs text-muted-foreground">
-                        {unidadeMesa?.name ?? "Afya Grill"} · pedido enviado direto para a cozinha
+                        {unidadeMesa?.name ?? "Afya Grill"} · pedido enviado direto para a cozinha ·
+                        pagamento só na conta, no final
                       </p>
                     </div>
                   </div>
@@ -500,115 +529,124 @@ function CartPage() {
                 )}
               </div>
 
-              <div className="mt-6 space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                  Forma de pagamento
-                </p>
-
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => selecionarPagamento("pix")}
-                    className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-xs font-medium transition-colors ${
-                      pagamento === "pix"
-                        ? "border-primary bg-secondary text-foreground"
-                        : "border-input text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <QrCode className="h-4 w-4" /> Pix
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => selecionarPagamento("credito")}
-                    className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-xs font-medium transition-colors ${
-                      pagamento === "credito"
-                        ? "border-primary bg-secondary text-foreground"
-                        : "border-input text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <CreditCard className="h-4 w-4" /> Crédito
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => selecionarPagamento("debito")}
-                    className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-xs font-medium transition-colors ${
-                      pagamento === "debito"
-                        ? "border-primary bg-secondary text-foreground"
-                        : "border-input text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <CreditCard className="h-4 w-4" /> Débito
-                  </button>
+              {isMesa ? (
+                <div className="mt-6 flex items-center gap-3 rounded-xl border border-border bg-background px-3.5 py-3 text-xs text-muted-foreground">
+                  <ShieldCheck className="h-4 w-4 shrink-0 text-primary" />
+                  Sem pagamento agora — quando terminar de pedir, chame o garçom ou peça a conta
+                  pelo cardápio digital pra fechar tudo de uma vez.
                 </div>
+              ) : (
+                <div className="mt-6 space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                    Forma de pagamento
+                  </p>
 
-                {pagamento === "pix" && pixCode && (
-                  <div className="rounded-xl border border-border bg-background p-3">
-                    <p className="text-[11px] text-muted-foreground">
-                      Código Pix copia e cola (simulado)
-                    </p>
-                    <p className="mt-1.5 break-all font-mono text-[11px] leading-relaxed text-foreground">
-                      {pixCode}
-                    </p>
+                  <div className="grid grid-cols-3 gap-2">
                     <button
                       type="button"
-                      onClick={copiarPix}
-                      className="mt-2.5 inline-flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent"
+                      onClick={() => selecionarPagamento("pix")}
+                      className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-xs font-medium transition-colors ${
+                        pagamento === "pix"
+                          ? "border-primary bg-secondary text-foreground"
+                          : "border-input text-muted-foreground hover:text-foreground"
+                      }`}
                     >
-                      <Copy className="h-3.5 w-3.5" /> Copiar código
+                      <QrCode className="h-4 w-4" /> Pix
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => selecionarPagamento("credito")}
+                      className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-xs font-medium transition-colors ${
+                        pagamento === "credito"
+                          ? "border-primary bg-secondary text-foreground"
+                          : "border-input text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <CreditCard className="h-4 w-4" /> Crédito
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => selecionarPagamento("debito")}
+                      className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-xs font-medium transition-colors ${
+                        pagamento === "debito"
+                          ? "border-primary bg-secondary text-foreground"
+                          : "border-input text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <CreditCard className="h-4 w-4" /> Débito
                     </button>
                   </div>
-                )}
 
-                {(pagamento === "credito" || pagamento === "debito") && (
-                  <div className="space-y-2.5">
-                    <input
-                      value={cartao.numero}
-                      onChange={(e) => updateCartao("numero", e.target.value)}
-                      placeholder="Número do cartão"
-                      inputMode="numeric"
-                      autoComplete="cc-number"
-                      className={`w-full rounded-xl border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary ${
-                        cartaoErrors.numero ? "border-destructive" : "border-input"
-                      }`}
-                    />
-                    <input
-                      value={cartao.nome}
-                      onChange={(e) => updateCartao("nome", e.target.value)}
-                      placeholder="Nome impresso no cartão"
-                      autoComplete="cc-name"
-                      className={`w-full rounded-xl border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary ${
-                        cartaoErrors.nome ? "border-destructive" : "border-input"
-                      }`}
-                    />
-                    <div className="flex gap-2.5">
-                      <input
-                        value={cartao.validade}
-                        onChange={(e) => updateCartao("validade", e.target.value)}
-                        placeholder="Validade (MM/AA)"
-                        autoComplete="cc-exp"
-                        className={`w-full rounded-xl border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary ${
-                          cartaoErrors.validade ? "border-destructive" : "border-input"
-                        }`}
-                      />
-                      <input
-                        value={cartao.cvv}
-                        onChange={(e) => updateCartao("cvv", e.target.value)}
-                        placeholder="CVV"
-                        inputMode="numeric"
-                        autoComplete="cc-csc"
-                        className={`w-full rounded-xl border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary ${
-                          cartaoErrors.cvv ? "border-destructive" : "border-input"
-                        }`}
-                      />
-                    </div>
-                    {Object.values(cartaoErrors).some(Boolean) && (
-                      <p className="flex items-center gap-1.5 text-xs text-destructive">
-                        <AlertCircle className="h-3.5 w-3.5 shrink-0" /> Confira os dados do cartão
+                  {pagamento === "pix" && pixCode && (
+                    <div className="rounded-xl border border-border bg-background p-3">
+                      <p className="text-[11px] text-muted-foreground">
+                        Código Pix copia e cola (simulado)
                       </p>
-                    )}
-                  </div>
-                )}
-              </div>
+                      <p className="mt-1.5 break-all font-mono text-[11px] leading-relaxed text-foreground">
+                        {pixCode}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={copiarPix}
+                        className="mt-2.5 inline-flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent"
+                      >
+                        <Copy className="h-3.5 w-3.5" /> Copiar código
+                      </button>
+                    </div>
+                  )}
+
+                  {(pagamento === "credito" || pagamento === "debito") && (
+                    <div className="space-y-2.5">
+                      <input
+                        value={cartao.numero}
+                        onChange={(e) => updateCartao("numero", e.target.value)}
+                        placeholder="Número do cartão"
+                        inputMode="numeric"
+                        autoComplete="cc-number"
+                        className={`w-full rounded-xl border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary ${
+                          cartaoErrors.numero ? "border-destructive" : "border-input"
+                        }`}
+                      />
+                      <input
+                        value={cartao.nome}
+                        onChange={(e) => updateCartao("nome", e.target.value)}
+                        placeholder="Nome impresso no cartão"
+                        autoComplete="cc-name"
+                        className={`w-full rounded-xl border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary ${
+                          cartaoErrors.nome ? "border-destructive" : "border-input"
+                        }`}
+                      />
+                      <div className="flex gap-2.5">
+                        <input
+                          value={cartao.validade}
+                          onChange={(e) => updateCartao("validade", e.target.value)}
+                          placeholder="Validade (MM/AA)"
+                          autoComplete="cc-exp"
+                          className={`w-full rounded-xl border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary ${
+                            cartaoErrors.validade ? "border-destructive" : "border-input"
+                          }`}
+                        />
+                        <input
+                          value={cartao.cvv}
+                          onChange={(e) => updateCartao("cvv", e.target.value)}
+                          placeholder="CVV"
+                          inputMode="numeric"
+                          autoComplete="cc-csc"
+                          className={`w-full rounded-xl border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary ${
+                            cartaoErrors.cvv ? "border-destructive" : "border-input"
+                          }`}
+                        />
+                      </div>
+                      {Object.values(cartaoErrors).some(Boolean) && (
+                        <p className="flex items-center gap-1.5 text-xs text-destructive">
+                          <AlertCircle className="h-3.5 w-3.5 shrink-0" /> Confira os dados do
+                          cartão
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="mt-5 flex gap-2">
                 <input
@@ -662,16 +700,25 @@ function CartPage() {
                 className="mt-6 w-full rounded-xl py-3.5 text-sm font-semibold text-primary-foreground shadow-ember transition-transform hover:scale-[1.02] active:scale-[0.99]"
                 style={{ background: "var(--gradient-ember)" }}
               >
-                Finalizar pedido
+                {isMesa ? "Enviar pedido para a cozinha" : "Finalizar pedido"}
               </button>
 
               <div className="mt-5 flex flex-col gap-2 text-xs text-muted-foreground">
-                <p className="inline-flex items-center gap-2">
-                  <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Pagamento protegido
-                </p>
-                <p className="inline-flex items-center gap-2">
-                  <Bike className="h-3.5 w-3.5 text-primary" /> Frete grátis acima de R$ 150
-                </p>
+                {isMesa ? (
+                  <p className="inline-flex items-center gap-2">
+                    <UtensilsCrossed className="h-3.5 w-3.5 text-primary" /> Pode pedir quantas
+                    vezes quiser — a conta fecha tudo junto no final
+                  </p>
+                ) : (
+                  <>
+                    <p className="inline-flex items-center gap-2">
+                      <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Pagamento protegido
+                    </p>
+                    <p className="inline-flex items-center gap-2">
+                      <Bike className="h-3.5 w-3.5 text-primary" /> Frete grátis acima de R$ 150
+                    </p>
+                  </>
+                )}
               </div>
             </motion.aside>
           </div>

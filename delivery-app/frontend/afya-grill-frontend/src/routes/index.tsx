@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion, useScroll, useTransform } from "motion/react";
+import { AnimatePresence, motion, useScroll, useTransform } from "motion/react";
 import {
   ArrowRight,
+  CheckCircle2,
   ChefHat,
   Clock,
   Flame,
   Instagram,
+  Loader2,
   Mail,
   MapPin,
   Phone,
@@ -15,7 +17,7 @@ import {
   Star,
   Utensils,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent, type SVGProps } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import heroImg from "@/assets/hero.jpg";
 import { Loader } from "@/components/Loader";
@@ -49,6 +51,89 @@ export const Route = createFileRoute("/")({
   }),
   component: Home,
 });
+
+// lucide-react só tem ícones genéricos, sem logos de marca — o WhatsApp precisa de um
+// SVG próprio pra ficar reconhecível, com a mesma assinatura de props dos ícones do
+// lucide (aceita className) pra encaixar no mesmo array/mapa dos outros links sociais.
+function WhatsAppIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M17.472 14.382c-.297-.149-1.758-.868-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479s1.065 2.876 1.213 3.074c.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347" />
+      <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.5 3.7 1.46 5.3L2 22l4.9-1.53a9.87 9.87 0 0 0 5.14 1.4h.005c5.46 0 9.9-4.44 9.9-9.91S17.5 2 12.04 2m0 18.16h-.004a8.24 8.24 0 0 1-4.2-1.15l-.3-.18-3.12.99.99-3.04-.2-.32a8.21 8.21 0 0 1-1.26-4.4c0-4.54 3.7-8.23 8.24-8.23a8.19 8.19 0 0 1 5.83 2.42 8.17 8.17 0 0 1 2.42 5.83c0 4.54-3.7 8.23-8.24 8.23" />
+    </svg>
+  );
+}
+
+// Ainda não existe um serviço de e-mail marketing por trás do formulário — simula o
+// envio (com um pequeno "carregando" pra parecer real) e mostra uma confirmação animada,
+// deixando a experiência pronta pro dia em que essa integração existir de verdade.
+function NewsletterForm() {
+  const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+  const [email, setEmail] = useState("");
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (status !== "idle" || !email.trim()) return;
+    setStatus("loading");
+    setTimeout(() => setStatus("success"), 900);
+  }
+
+  return (
+    <AnimatePresence mode="wait">
+      {status === "success" ? (
+        <motion.div
+          key="success"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="mt-5 flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3.5"
+        >
+          <motion.span
+            initial={{ scale: 0, rotate: -45 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 320, damping: 16, delay: 0.1 }}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-primary-foreground"
+            style={{ background: "var(--gradient-ember)" }}
+          >
+            <CheckCircle2 className="h-5 w-5" />
+          </motion.span>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold">Inscrito com sucesso!</p>
+            <p className="truncate text-xs text-muted-foreground">
+              {email} vai receber nossas novidades em breve.
+            </p>
+          </div>
+        </motion.div>
+      ) : (
+        <motion.form
+          key="form"
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.25 }}
+          onSubmit={handleSubmit}
+          className="mt-5 flex overflow-hidden rounded-xl border border-input bg-background"
+        >
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={status === "loading"}
+            placeholder="seu@email.com"
+            className="w-full bg-transparent px-4 py-3 text-sm outline-none placeholder:text-muted-foreground disabled:opacity-60"
+          />
+          <button
+            type="submit"
+            disabled={status === "loading"}
+            className="inline-flex w-14 shrink-0 items-center justify-center text-sm font-semibold text-primary-foreground disabled:opacity-80"
+            style={{ background: "var(--gradient-ember)" }}
+          >
+            {status === "loading" ? <Loader2 className="h-4 w-4 animate-spin" /> : "Ok"}
+          </button>
+        </motion.form>
+      )}
+    </AnimatePresence>
+  );
+}
 
 const stats = [
   { value: "6", label: "unidades no Rio e em Caxias" },
@@ -545,6 +630,11 @@ function Home() {
                 },
                 { Icon: Mail, href: "mailto:ola@afyagrill.com.br", label: "E-mail" },
                 { Icon: Phone, href: "tel:+552140028922", label: "Telefone" },
+                {
+                  Icon: WhatsAppIcon,
+                  href: "https://wa.me/5521995423682",
+                  label: "WhatsApp",
+                },
               ].map(({ Icon, href, label }) => (
                 <a
                   key={label}
@@ -576,6 +666,17 @@ function Home() {
                 <span>ola@afyagrill.com.br</span>
               </li>
               <li className="flex items-start gap-3">
+                <WhatsAppIcon className="mt-0.5 h-4 w-4 text-primary" />
+                <a
+                  href="https://wa.me/5521995423682"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="transition-colors hover:text-foreground"
+                >
+                  (21) 99542-3682
+                </a>
+              </li>
+              <li className="flex items-start gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 text-primary" />
                 <span>
                   Av. Presidente Vargas, 1200 — Centro
@@ -591,24 +692,7 @@ function Home() {
             <p className="mt-4 text-sm text-muted-foreground">
               Novas cozinhas, menus sazonais e cupons antes de todo mundo.
             </p>
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="mt-5 flex overflow-hidden rounded-xl border border-input bg-background"
-            >
-              <input
-                type="email"
-                required
-                placeholder="seu@email.com"
-                className="w-full bg-transparent px-4 py-3 text-sm outline-none placeholder:text-muted-foreground"
-              />
-              <button
-                type="submit"
-                className="px-5 text-sm font-semibold text-primary-foreground"
-                style={{ background: "var(--gradient-ember)" }}
-              >
-                Ok
-              </button>
-            </form>
+            <NewsletterForm />
           </Reveal>
         </div>
         <div className="border-t border-border px-4 py-6 text-center text-xs text-muted-foreground">

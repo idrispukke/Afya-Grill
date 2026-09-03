@@ -21,7 +21,10 @@ export function useAiRace() {
       onResult: (value: T, source: "ai" | "local") => void,
       opts: { timeoutMs?: number; upgrade?: boolean } = {},
     ) => {
-      const { timeoutMs = 2500, upgrade = true } = opts;
+      // 4s dá mais espaço pro Gemini responder de verdade antes de cair pro fallback local
+      // (mais fraco) — ainda folgado dentro do teto de 5s combinado, e evita trocar uma
+      // resposta rica da IA por uma genérica só por causa de meio segundo de diferença.
+      const { timeoutMs = 4000, upgrade = true } = opts;
       const id = ++idRef.current;
       let resolved = false;
 
